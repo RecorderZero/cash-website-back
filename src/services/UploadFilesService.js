@@ -2,16 +2,20 @@ import http from "../http-common"
 
 class UploadFilesService {
     upload(files) {
-        let formData = new FormData();
+        let requests = [];
+        
         for (let x = 0; x < files.length; x++) {
+            let formData = new FormData();
             formData.append("image", files[x]);
+
+            let request = http.post('/newimage/', formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+            requests.push(request);
         }
-        // formData.append("related_new", 1)
-        return http.post('/newimage/', formData, {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            }
-        });
+        return Promise.all(requests);
     }
 
     // getFiles() {

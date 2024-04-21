@@ -1,24 +1,30 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
     <v-container>
-    <v-file-input
-      label="File input w/ chips"
-      chips
-      multiple
-      accept="image/jpeg,image/png"
-      v-model="images"
-    ></v-file-input>
-    <v-btn color="success" :disabled="!images" dark small @click="upload">
-            Upload
-            <v-icon right dark>mdi-cloud-upload</v-icon>
-          </v-btn>
-          <!-- <v-list>
-            <v-list-item v-for="(item,index) in files" :key="index" >
-                {{ item }}
-            </v-list-item>
-        </v-list> -->
-          {{ images }}
-          訊息：{{ message }}
+        <v-row justify="center" align="center">
+            <v-col cols="9" align="center">
+                <v-file-input
+                label="File input w/ chips"
+                chips
+                multiple
+                accept="image/jpeg,image/png"
+                v-model="images"
+                ></v-file-input>
+            </v-col>
+            <v-col cols="3" class="pb-8">
+                <v-btn color="success" :disabled="!images" dark small @click="upload">
+                    Upload
+                    <v-icon right dark>mdi-cloud-upload</v-icon>
+                </v-btn>
+            </v-col>
+        </v-row>
+        <v-card v-if="message">
+            <v-list>
+                <v-list-item v-for="(item,index) in message" :key="index" >
+                    圖片{{ decodeURI(item.data.image.split('/').slice(-1)) }}已上傳，id{{ item.data.id }}
+                </v-list-item>
+            </v-list>
+        </v-card>
     </v-container>
 </template>
 
@@ -30,8 +36,6 @@ export default {
         return {
             message: "",
             images: null,
-
-            fileInfos: [],
         };
     },
     methods: {

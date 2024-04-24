@@ -18,10 +18,11 @@
                 </v-btn>
             </v-col>
         </v-row>
-        <v-card v-if="message">
-            <v-list>
-                <v-list-item v-for="(item,index) in message" :key="index" >
-                    圖片{{ decodeURI(item.data.image.split('/').slice(-1)) }}已上傳，id{{ item.data.id }}
+        <v-card>
+            <v-card-text v-if="message">{{ message }}</v-card-text>
+            <v-list v-else>
+                <v-list-item v-for="(item, index) in uploadItems" :key="index">
+                    {{ item }}
                 </v-list-item>
             </v-list>
         </v-card>
@@ -34,21 +35,24 @@ import UploadService from "../services/UploadFilesService"
 export default {
     data() {
         return {
-            message: "",
+            message: "務必先上傳圖片，並輸入封面圖片id後再儲存貼文。",
             images: null,
+            uploadItems: [],
+            idArray: [],
         };
     },
     methods: {
         upload() {
-            this.message = "";
+            this.message = "上傳中";
             UploadService.upload(this.images)
                 .then((response) => {
-                    this.message = response;
-                    // return UploadService.getFiles();
+                    this.message = "";
+                    for(let x = 0; x < response.length; x++) {
+                        this.uploadItems.push("圖片" + decodeURI(response[x].data.image.split('/').slice(-1)) + "已上傳，id" + response[x].data.id);
+                        this.idArray.push(response[x].data.id);
+                    }
+                    this.$emit('id-array-updated', this.idArray);
                 })
-                // .then((files) => {
-                //     this.fileInfos = files.data;
-                // })
                 .catch(error => {
                     if (error.response) {
                         // 在控制台顯示後端返回的詳細錯誤訊息
@@ -62,6 +66,7 @@ export default {
                         console.error('錯誤訊息:', error.message);
                     }
                     this.images = null;
+                    this.uploadItems = [];
                 })
         }
     },

@@ -17,10 +17,6 @@ class UploadFilesService {
         }
         return Promise.all(requests);
     }
-
-    // getFiles() {
-    //     return http.get("/files")
-    // }
 }
 
 export default new UploadFilesService();

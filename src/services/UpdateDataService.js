@@ -31,6 +31,21 @@ class UpdateDataService {
         }
         return Promise.all(requests);
     }
+    updateRelatedProject(images, project_id) {
+        let requests = [];
+        
+        for (let x = 0; x < images.length; x++) {
+            let request = http.patch('/projectimage/' + images[x] + '/', {
+                'related_project': project_id
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            requests.push(request);
+        }
+        return Promise.all(requests);
+    }
 }
 
 export default new UpdateDataService();

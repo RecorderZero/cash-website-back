@@ -10,7 +10,7 @@
     <v-data-table
       :headers="headers"
       :items="items"
-      :sort-by="[{ key: 'id', order: 'asc' }]"
+      :sort-by="[{ key: 'id', order: 'desc' }]"
     >
       <template v-slot:top>
         <v-toolbar flat>
@@ -44,7 +44,7 @@
                         ></v-textarea>
                     </v-col>
                     <v-col cols="12">
-                      <imageUploader source="new" @id-array-updated="handleUdArrayUpdate" />
+                      <imageUploader source="new" @id-array-updated="handleIdArrayUpdate" />
                     </v-col>
                     <v-col cols="6">
                       <v-select
@@ -63,7 +63,7 @@
                     <v-col cols="12">
                       <v-text-field
                         v-model="editedItem.date"
-                        label="發佈日期(yyyy-mm-dd)"
+                        label="日期(yyyy-mm-dd)"
                         ></v-text-field>
                         <!-- <v-date-picker
                             color="primary"
@@ -212,7 +212,7 @@
             .catch(error => {console.log(error)})
         },
 
-        handleUdArrayUpdate(idArray) {
+        handleIdArrayUpdate(idArray) {
             this.editedItem.images = idArray;
         },
   
@@ -270,7 +270,7 @@
           // } else {
           try {
             const imageItem = await http.get('/newimage/' + this.editedItem.imageUrl + '/')
-            console.log(imageItem)
+            // console.log(imageItem)
             this.editedItem.imageUrl = imageItem.data.image
             let response = await http.post('/new/', this.editedItem)
             response = response.data
@@ -289,4 +289,3 @@
       },
     }
   </script>
-  ../services/UpdateDataService

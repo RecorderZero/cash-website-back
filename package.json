@@ -12,7 +12,9 @@
     "axios": "^1.6.8",
     "core-js": "^3.34.0",
     "roboto-fontface": "*",
+    "sortable": "^2.0.0",
     "vue": "^3.4.0",
+    "vuedraggable": "^4.1.0",
     "vuetify": "^3.5.0"
   },
   "devDependencies": {

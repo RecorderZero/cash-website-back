@@ -44,7 +44,7 @@
                         ></v-textarea>
                     </v-col>
                     <v-col cols="12">
-                      <imageUploader @id-array-updated="handleUdArrayUpdate" />
+                      <imageUploader source="new" @id-array-updated="handleUdArrayUpdate" />
                     </v-col>
                     <v-col cols="6">
                       <v-select
@@ -72,8 +72,8 @@
                     </v-col>
                   </v-row>
                 </v-container>
-                {{ editedItem }}
-                {{ editedItem.date }}
+                <!--{{ editedItem }}
+                {{ editedItem.date }}-->
               </v-card-text>
   
               <v-card-actions>
@@ -125,7 +125,7 @@
   
   <script>
   import http from "../http-common"
-  import UpdateImage from "../services/UpdateRelatedNewService"
+  import UpdateData from "../services/UpdateDataService"
     export default {
       data: () => ({
         classification: ['竣工', '榮譽', '活動'],
@@ -185,13 +185,28 @@
       },
   
       methods: {
+        toIsoString(date) {
+          var tzo = -date.getTimezoneOffset(),
+              dif = tzo >= 0 ? '+' : '-',
+              pad = function(num) {
+                  return (num < 10 ? '0' : '') + num;
+              };
+
+          return date.getFullYear() +
+              '-' + pad(date.getMonth() + 1) +
+              '-' + pad(date.getDate()) +
+              'T' + pad(date.getHours()) +
+              ':' + pad(date.getMinutes()) +
+              ':' + pad(date.getSeconds()) +
+              dif + pad(Math.floor(Math.abs(tzo) / 60)) +
+              ':' + pad(Math.abs(tzo) % 60);
+        },
         initialize() {
           let yourDate = new Date()
-          this.editedItem.date = yourDate.toISOString().split('T')[0]
+          this.editedItem.date = this.toIsoString(yourDate).split('T')[0]
           this.defaultItem.date = this.editedItem.date
-          console.log(yourDate)
-          console.log(yourDate.toISOString())
-          console.log(this.editedItem.date)
+          // console.log(yourDate)
+          // console.log(this.editedItem.date)
           http.get('new/')
             .then(response => {this.items = response.data})
             .catch(error => {console.log(error)})
@@ -215,7 +230,7 @@
   
         async deleteItemConfirm() {
             try {
-                const response = await http.delete('/new/' + this.editedId + '/')
+                await http.delete('/new/' + this.editedId + '/')
                 this.initialize()
                 this.alertType = "success"
                 this.alertTitle = "刪除成功"
@@ -259,7 +274,7 @@
             this.editedItem.imageUrl = imageItem.data.image
             let response = await http.post('/new/', this.editedItem)
             response = response.data
-            await UpdateImage.update(this.editedItem.images, response.id)
+            await UpdateData.updateRelatedNew(this.editedItem.images, response.id)
             this.alertType = "success"
             this.alertTitle = "儲存成功"
             this.alertText = "編號：" + response.id + "標題：" + response.title + "已儲存"
@@ -274,4 +289,4 @@
       },
     }
   </script>
-  
+  ../services/UpdateDataService

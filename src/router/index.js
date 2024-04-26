@@ -8,11 +8,11 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
-  // {
-  //   path: "/test",
-  //   name: "Test",
-  //   component: () => import('@/components/pagination.vue')
-  // },
+  {
+    path: "/test",
+    name: "Test",
+    component: () => import('@/components/draggable.vue')
+  },
   {
     path: '/register',
     component: () => import('@/layouts/sandwich/SandwichLayout.vue'),

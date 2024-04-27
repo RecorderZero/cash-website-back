@@ -44,14 +44,15 @@
                         ></v-textarea>
                     </v-col>
                     <v-col cols="12">
-                      <imageUploader source="new" @id-array-updated="handleIdArrayUpdate" />
+                      <imageUploader source="new" :cloudItems="cloudItems" @id-array-updated="handleIdArrayUpdate" />
                     </v-col>
                     <v-col cols="6">
                       <v-select
-                            label="封面圖片id"
-                            v-model="editedItem.imageUrl"
-                            :items="editedItem.images"
-                        ></v-select>
+                        label="封面圖片id"
+                        v-model="editedItem.imageUrl"
+                        :items="editedItem.images"
+                      ></v-select>
+                      <!-- {{ editedItem.images }} -->
                     </v-col>
                     <v-col cols="6">
                         <v-select
@@ -71,6 +72,7 @@
                         ></v-date-picker> -->
                     </v-col>
                   </v-row>
+                  <!-- {{ editedItem }} -->
                 </v-container>
                 <!--{{ editedItem }}
                 {{ editedItem.date }}-->
@@ -110,10 +112,10 @@
         </v-toolbar>
       </template>
       <template v-slot:item.actions="{ item }">
-        <!-- update待開發
+        <!-- update待開發 -->
         <v-icon class="me-2" size="small" @click="editItem(item)">
           mdi-pencil
-        </v-icon> -->
+        </v-icon>
         <v-icon size="small" @click="deleteItem(item)"> mdi-delete </v-icon>
       </template>
       <template v-slot:no-data>
@@ -130,6 +132,7 @@
       data: () => ({
         classification: ['竣工', '榮譽', '活動'],
         alertType: null,
+        cloudItems: null,
         alertTitle: null,
         alertText: null,
         dialog: false,
@@ -146,6 +149,7 @@
           { title: '操作', key: 'actions', sortable: false },
         ],
         items: [],
+        // action: 'add',
         editedId: -1,
         editedItem: {
           title: null,
@@ -207,19 +211,58 @@
           this.defaultItem.date = this.editedItem.date
           // console.log(yourDate)
           // console.log(this.editedItem.date)
-          http.get('new/')
+          http.get('/new/')
             .then(response => {this.items = response.data})
             .catch(error => {console.log(error)})
         },
 
         handleIdArrayUpdate(idArray) {
             this.editedItem.images = idArray;
+            this.editedItem.imageUrl = null;
         },
   
-        editItem(item) {
-          this.editedId = item.id
-          this.editedItem = Object.assign({}, item)
-          this.dialog = true
+        async editItem(item) {
+          try {
+            this.editedId = item.id
+            // this.action = 'edit'
+            this.editedItem = Object.assign({}, item)
+            // console.log(this.editedItem)
+            this.editedItem.images = []
+            // console.log(this.editedItem)
+            const response = await http.get('/get_new_images_detail/' + item.id + '/')
+            this.formatResponse(response.data)
+            this.findImageUrlId()
+            this.dialog = true
+          } catch(error) {
+            console.log(error)
+          }
+        },
+
+        formatResponse(data) {
+          for(let x = 0; x < data.length; x++) {
+            const image_instance = data[x]
+            // console.log(image_instance)
+            this.editedItem.images.push({
+              name: decodeURI(image_instance.image.split('/').slice(-1)[0]),
+              id: image_instance.id
+            })
+          }
+          // console.log('images' + this.editedItem.images)
+          this.cloudItems = this.editedItem.images.slice()
+          // console.log('cloudItems:' + this.cloudItems)
+        },
+
+        findImageUrlId() {
+          const fileName = decodeURI(this.editedItem.imageUrl.split('/').slice(-1))
+          // console.log('filename:' + fileName)
+          // console.log(this.editedItem.images)
+          // console.log(this.editedItem.images.findIndex((file) => file.name === fileName))
+          this.editedItem.imageUrl = this.editedItem.images.find((file) => file.name === fileName).id
+          for (let x = 0; x < this.editedItem.images.length; x++) {
+            this.editedItem.images[x] = this.editedItem.images[x].id
+          }
+          
+          
         },
   
         deleteItem(item) {
@@ -250,6 +293,8 @@
           this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedId = -1
+          this.cloudItems = null
+          // this.action = 'add'
         })
         },
   
@@ -263,27 +308,46 @@
   
         async save() {
           // update待開發
-          // try {if (this.editedId > -1) {
-          //   //要改indexOf找id
-          //   //修改的邏輯還須調整
-          //   Object.assign(this.items[this.editedId], this.editedItem)
+          // if (this.editedId > -1) {
+            try {
+              const imageItem = await http.get('/newimage/' + this.editedItem.imageUrl + '/')
+              // console.log(imageItem)
+              let response = null
+              this.editedItem.imageUrl = imageItem.data.image
+              if (this.editedId > -1) {
+                response = await http.patch('/new/' + this.editedId + '/', this.editedItem)
+              } else {
+                response = await http.post('/new/', this.editedItem)
+              }
+              response = response.data
+              await UpdateData.updateRelatedNew(this.editedItem.images, response.id)
+              this.alertType = "success"
+              this.alertTitle = "儲存成功"
+              this.alertText = "編號：" + response.id + "標題：" + response.title + "已儲存"
+              this.initialize()
+            } catch(error) {
+              this.alertType = "error"
+              this.alertTitle = "儲存失敗"
+              this.alertText = error
+            }
           // } else {
-          try {
-            const imageItem = await http.get('/newimage/' + this.editedItem.imageUrl + '/')
-            // console.log(imageItem)
-            this.editedItem.imageUrl = imageItem.data.image
-            let response = await http.post('/new/', this.editedItem)
-            response = response.data
-            await UpdateData.updateRelatedNew(this.editedItem.images, response.id)
-            this.alertType = "success"
-            this.alertTitle = "儲存成功"
-            this.alertText = "編號：" + response.id + "標題：" + response.title + "已儲存"
-            this.initialize()
-          } catch(error) {
-            this.alertType = "error"
-            this.alertTitle = "儲存失敗"
-            this.alertText = error
-          }
+          //   try {
+          //   const imageItem = await http.get('/newimage/' + this.editedItem.imageUrl + '/')
+          //   // console.log(imageItem)
+          //   this.editedItem.imageUrl = imageItem.data.image
+          //   let response = await http.post('/new/', this.editedItem)
+          //   response = response.data
+          //   await UpdateData.updateRelatedNew(this.editedItem.images, response.id)
+          //   this.alertType = "success"
+          //   this.alertTitle = "儲存成功"
+          //   this.alertText = "編號：" + response.id + "標題：" + response.title + "已儲存"
+          //   this.initialize()
+          //   } catch(error) {
+          //     this.alertType = "error"
+          //     this.alertTitle = "儲存失敗"
+          //     this.alertText = error
+          //   }
+          // }
           this.close()
         },
       },

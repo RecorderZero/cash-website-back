@@ -11,7 +11,7 @@ const routes = [
   {
     path: "/test",
     name: "Test",
-    component: () => import('@/components/draggable.vue')
+    component: () => import('@/components/newimageUploader.vue')
   },
   {
     path: '/register',

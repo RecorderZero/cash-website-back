@@ -8,10 +8,8 @@
                 chips
                 multiple
                 accept="image/jpeg,image/png"
-                clearable
                 v-model="images"
                 ></v-file-input>
-                <!-- {{ images }} -->
             </v-col>
             <v-col cols="3" class="pb-8">
                 <v-btn color="success" :disabled="!images" dark small @click="uploadImage">
@@ -33,70 +31,42 @@
             </v-col>
         </v-row>
         <v-card>
-            <v-list v-if="uploadedItems.length !== 0">
-                <v-list-item v-for="(item, index) in uploadedItems" :key="index">
-                    圖片：{{ item.name }}已上傳，id{{ item.id }}
-                    <v-btn
-                        color="error"
-                        @click="deleteItem(item)"
-                    >刪除</v-btn>
+            <v-card-text v-if="message">{{ message }}</v-card-text>
+            <v-list v-else>
+                <v-list-item v-for="(item, index) in uploadItems" :key="index">
+                    {{ item }}
                 </v-list-item>
             </v-list>
-            <v-card-text v-else>{{ message }}</v-card-text>
-            <!-- images:{{ images }}
-            uploadedItems:{{ uploadedItems }}
-            idArray:{{ idArray }} -->
         </v-card>
-        <!-- {{ uploadedItems }} -->
-    <!-- <v-container v-if="cloudItems">
-        {{ cloudItems }}
-    </v-container> -->
     </v-container>
 </template>
 
 <script>
 import UploadService from "../services/UploadFilesService"
-import http from "../http-common"
 
 export default {
-    props: ['source', 'cloudItems'],
+    props: ['source'],
     data() {
         return {
-            // source: 'new',
             button: "",
             message: "",
             images: null,
-            uploadedItems: [],
+            uploadItems: [],
             idArray: [],
         };
     },
     created() {
-        switch (this.$props.source) {
-            case 'new':
-                this.message = "請確保上傳檔案檔名不含底線(_)。務必先上傳圖片，並輸入封面圖片id後再儲存貼文。"
-                this.button = "新聞圖片上傳"
-                break
-            case 'carousel':
-                this.message = "請確保上傳檔案檔名不含底線(_)。請選擇要上傳的圖片，上傳後預設會直接顯示於前台。"
-                this.button = "跑馬燈圖片上傳"
-                break
-            case 'project':
-                this.message = "請確保上傳檔案檔名不含底線(_)。務必先上傳圖片，並輸入封面圖片id後再儲存專案。"
-                this.button = "工程圖片上傳"
-                break    
+        if(this.$props.source === 'new') {
+            this.message = "務必先上傳圖片，並輸入封面圖片id後再儲存貼文。"
+            this.button = "新聞圖片上傳"
         }
-    },
-    watch: {
-        cloudItems: {
-            handler(newCloudItems) {
-                if(newCloudItems !== null) {
-                    this.uploadedItems = newCloudItems
-                    for (let x = 0; x < newCloudItems.length; x++) {
-                        this.idArray.push(newCloudItems[x].id)
-                    }
-                }
-            },
-            immediate: true // 立即執行一次
+        else if(this.$props.source === 'carousel') {
+            this.message = "請選擇要上傳的圖片，上傳後預設會直接顯示於前台"
+            this.button = "跑馬燈圖片上傳"
+        }
+        else if(this.$props.source === 'project') {
+            this.message = "務必先上傳圖片，並輸入封面圖片id後再儲存專案。"
+            this.button = "工程圖片上傳"
         }
     },
     methods: {
@@ -106,11 +76,7 @@ export default {
                 .then((response) => {
                     this.message = "";
                     for(let x = 0; x < response.length; x++) {
-                        let uploadItem = {
-                            name: decodeURI(response[x].data.image.split('/').slice(-1)),
-                            id: response[x].data.id
-                        }
-                        this.uploadedItems.push(uploadItem);
+                        this.uploadItems.push("圖片" + decodeURI(response[x].data.image.split('/').slice(-1)) + "已上傳，id" + response[x].data.id);
                         // new, project要回傳id才能更新
                         if (this.$props.source !== 'carousel') {
                             this.idArray.push(response[x].data.id);
@@ -126,7 +92,6 @@ export default {
                         location.reload();
                     })
                     }
-                    this.images = null
                 })
                 .catch(error => {
                     if (error.response) {
@@ -141,34 +106,8 @@ export default {
                         console.error('錯誤訊息:', error.message);
                     }
                     this.images = null;
-                    this.uploadedItems = [];
+                    this.uploadItems = [];
                 })
-        },
-        deleteItem(item) {
-            // console.log(item.id)
-            // console.log(item.name)
-            // console.log(this.images[0])
-            // if(item.name.includes('_')) {
-            //     const originalName = item.name.split('_')[0]
-            //     // console.log(originalName)
-            //     // console.log(this.images.findIndex(file => file.name.includes(originalName)))
-            //     const indexInImages = this.images.findIndex(file => file.name.includes(originalName))
-            //     this.images.splice(indexInImages, 1)
-            //     // const index = this.images.findIndex(item => {item.name})
-            // }
-            http.delete('/' + this.$props.source + 'image/' + item.id + '/')
-                .then((response) => {
-                    const indexInuploadedItems = this.uploadedItems.findIndex(file => file.name === item.name)
-                    // console.log(this.uploadedItems.findIndex(file => file.name === item.name))
-                    this.uploadedItems.splice(indexInuploadedItems, 1)
-                    // console.log(response)
-                    this.idArray.splice(this.idArray.indexOf(item.id), 1)
-                    this.$emit('id-array-updated', this.idArray);
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-
         },
         // uploadNewImage() {
         //     this.message = "上傳中";

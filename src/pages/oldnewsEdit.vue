@@ -14,7 +14,7 @@
     >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>工程一覽</v-toolbar-title>
+          <v-toolbar-title>貼文一覽</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog">
@@ -44,7 +44,7 @@
                         ></v-textarea>
                     </v-col>
                     <v-col cols="12">
-                      <imageUploader source="project" @id-array-updated="handleIdArrayUpdate" />
+                      <imageUploader source="new" @id-array-updated="handleIdArrayUpdate" />
                     </v-col>
                     <v-col cols="6">
                       <v-select
@@ -61,22 +61,6 @@
                         ></v-select>
                     </v-col>
                     <v-col cols="12">
-                      <v-text-field 
-                        v-model="editedItem.location"
-                        label="地點"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12">
-                        <v-select
-                            label="參與者"
-                            v-model="editedItem.employee"
-                            :items="employeeName"
-                            multiple
-                        ></v-select>
-                    </v-col>
-                    <!-- {{ employeeName }}
-                    {{ employeeId }} -->
-                    <v-col cols="12">
                       <v-text-field
                         v-model="editedItem.date"
                         label="日期(yyyy-mm-dd)"
@@ -88,8 +72,8 @@
                     </v-col>
                   </v-row>
                 </v-container>
-                <!-- {{ editedItem }} -->
-                <!-- {{ editedItem.date }} -->
+                <!--{{ editedItem }}
+                {{ editedItem.date }}-->
               </v-card-text>
   
               <v-card-actions>
@@ -106,7 +90,7 @@
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
               <v-card-title class="text-h5"
-                >確定要刪除此工程？</v-card-title
+                >確定要刪除此貼文？</v-card-title
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -144,10 +128,7 @@
   import UpdateData from "../services/UpdateDataService"
     export default {
       data: () => ({
-        classification: ['道路工程', '大地工程', '水利工程', '景觀工程'],
-        employeeName: [],
-        employeeId: [],
-        employeeIndex: [],
+        classification: ['竣工', '榮譽', '活動'],
         alertType: null,
         alertTitle: null,
         alertText: null,
@@ -171,8 +152,6 @@
           content: null,
           imageUrl: null,
           images: [],
-          employee: [],
-          location: null,
           classification: null,
           date: null,
         },
@@ -181,8 +160,6 @@
           content: null,
           imageUrl: null,
           images: [],
-          employee: [],
-          location: null,
           classification: null,
           date: null,
         },
@@ -204,16 +181,6 @@
       },
   
       created() {
-        http.get('/employee/')
-            .then(response => {
-                const employeeInstance = response.data
-                // console.log(employeeInstance)
-                for(let x = 0; x < employeeInstance.length; x++) {
-                    this.employeeName.push(employeeInstance[x].name)
-                    this.employeeId.push(employeeInstance[x].id)
-                }
-            })
-            .catch(error => {console.log(error)})
         this.initialize()
       },
   
@@ -235,13 +202,12 @@
               ':' + pad(Math.abs(tzo) % 60);
         },
         initialize() {
-            this.employeeIndex = [];
           let yourDate = new Date()
           this.editedItem.date = this.toIsoString(yourDate).split('T')[0]
           this.defaultItem.date = this.editedItem.date
           // console.log(yourDate)
           // console.log(this.editedItem.date)
-          http.get('/project/')
+          http.get('new/')
             .then(response => {this.items = response.data})
             .catch(error => {console.log(error)})
         },
@@ -265,7 +231,7 @@
   
         async deleteItemConfirm() {
             try {
-                await http.delete('/project/' + this.editedId + '/')
+                await http.delete('/new/' + this.editedId + '/')
                 this.initialize()
                 this.alertType = "success"
                 this.alertTitle = "刪除成功"
@@ -282,7 +248,6 @@
 
         close() {
           this.dialog = false
-          this.employeeIndex = []
           this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedId = -1
@@ -296,10 +261,6 @@
             this.editedId = -1
           })
         },
-
-        change() {
-            console.log("change")
-        },
   
         async save() {
           // update待開發
@@ -309,19 +270,12 @@
           //   Object.assign(this.items[this.editedId], this.editedItem)
           // } else {
           try {
-            const imageItem = await http.get('/projectimage/' + this.editedItem.imageUrl + '/')
+            const imageItem = await http.get('/newimage/' + this.editedItem.imageUrl + '/')
             // console.log(imageItem)
             this.editedItem.imageUrl = imageItem.data.image
-            for(let x = 0; x < this.editedItem.employee.length; x++) {
-                let employee = this.editedItem.employee[x]
-                // console.log("employee:"+employee)
-                this.editedItem.employee[x] = this.employeeId[this.employeeIndexInOriginArray(employee)]
-                // console.log("id:"+this.editedItem.employee[x])
-            }
-            // this.editedItem.employee = []
-            let response = await http.post('/project/', this.editedItem)
+            let response = await http.post('/new/', this.editedItem)
             response = response.data
-            await UpdateData.updateRelatedProject(this.editedItem.images, response.id)
+            await UpdateData.updateRelatedNew(this.editedItem.images, response.id)
             this.alertType = "success"
             this.alertTitle = "儲存成功"
             this.alertText = "編號：" + response.id + "標題：" + response.title + "已儲存"
@@ -332,10 +286,6 @@
             this.alertText = error
           }
           this.close()
-        },
-        employeeIndexInOriginArray(employee) {
-            // console.log("index:"+this.employeeName.indexOf(employee))
-            return this.employeeName.indexOf(employee)
         },
       },
     }

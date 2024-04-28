@@ -169,7 +169,7 @@ export default {
             //     // const index = this.images.findIndex(item => {item.name})
             // }
             http.delete('/' + this.$props.source + 'image/' + item.id + '/')
-                .then((response) => {
+                .then(() => {
                     const indexInuploadedItems = this.uploadedItems.findIndex(file => file.id === item.id)
                     // console.log(this.uploadedItems.findIndex(file => file.name === item.name))
                     this.uploadedItems.splice(indexInuploadedItems, 1)

@@ -112,7 +112,6 @@
         </v-toolbar>
       </template>
       <template v-slot:item.actions="{ item }">
-        <!-- update待開發 -->
         <v-icon class="me-2" size="small" @click="editItem(item)">
           mdi-pencil
         </v-icon>
@@ -131,8 +130,8 @@
     export default {
       data: () => ({
         classification: ['竣工', '榮譽', '活動'],
-        alertType: null,
         cloudItems: null,
+        alertType: null,
         alertTitle: null,
         alertText: null,
         dialog: false,
@@ -146,6 +145,7 @@
           { title: '標題', key: 'title', sortable: false },
           { title: '分類', key: 'classification' },
           { title: '發佈日期', key: 'date' },
+          // 加上權限
           { title: '操作', key: 'actions', sortable: false },
         ],
         items: [],
@@ -243,7 +243,7 @@
             const image_instance = data[x]
             // console.log(image_instance)
             this.editedItem.images.push({
-              name: decodeURI(image_instance.image.split('/').slice(-1)[0]),
+              imgUrl: decodeURI(image_instance.image),
               id: image_instance.id
             })
           }
@@ -253,16 +253,14 @@
         },
 
         findImageUrlId() {
-          const fileName = decodeURI(this.editedItem.imageUrl.split('/').slice(-1))
+          const fileUrl = decodeURI(this.editedItem.imageUrl)
           // console.log('filename:' + fileName)
           // console.log(this.editedItem.images)
           // console.log(this.editedItem.images.findIndex((file) => file.name === fileName))
-          this.editedItem.imageUrl = this.editedItem.images.find((file) => file.name === fileName).id
+          this.editedItem.imageUrl = this.editedItem.images.find((file) => file.imgUrl === fileUrl).id
           for (let x = 0; x < this.editedItem.images.length; x++) {
             this.editedItem.images[x] = this.editedItem.images[x].id
           }
-          
-          
         },
   
         deleteItem(item) {
@@ -307,7 +305,6 @@
         },
   
         async save() {
-          // update待開發
           // if (this.editedId > -1) {
             try {
               const imageItem = await http.get('/newimage/' + this.editedItem.imageUrl + '/')

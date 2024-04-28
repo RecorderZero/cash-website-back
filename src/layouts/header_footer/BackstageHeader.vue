@@ -23,7 +23,7 @@ const buttons = [
     {
         value: 'carouselEdit',
         text: '修改跑馬燈',
-        icon: 'mdi-newspaper-variant',
+        icon: 'mdi-view-carousel',
         textClass: 'text-brown-darken-1',
         to: '/carouselEdit',
     },

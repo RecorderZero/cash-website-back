@@ -35,7 +35,7 @@
         <v-card>
             <v-row v-if="uploadedItems.length !== 0">
                 <v-col align="center" cols="3" v-for="(item, index) in uploadedItems" :key="index">
-                    <v-img :src="item.imgUrl" height="80px"></v-img>
+                    <v-img :src="item.imgUrl" max-height="80px"></v-img>
                     已上傳，id{{ item.id }}<br>
                     <v-btn
                         color="error"
@@ -45,7 +45,7 @@
             </v-row>
             <!-- <v-list v-if="uploadedItems.length !== 0">
                 <v-list-item v-for="(item, index) in uploadedItems" :key="index">
-                    圖片：{{ item.name }}已上傳，id{{ item.id }}
+                    <v-img :src="item.imgUrl" max-width="100px"></v-img>已上傳，id{{ item.id }}
                     <v-btn
                         color="error"
                         @click="deleteItem(item)"
@@ -69,10 +69,10 @@ import UploadService from "../services/UploadFilesService"
 import http from "../http-common"
 
 export default {
-    props: ['source', 'cloudItems'],
+    props: ['cloudItems'],
     data() {
         return {
-            // source: 'new',
+            source: 'new',
             button: "",
             message: "",
             images: null,
@@ -81,17 +81,17 @@ export default {
         };
     },
     created() {
-        switch (this.$props.source) {
+        switch (this.source) {
             case 'new':
-                this.message = "務必先上傳圖片，並輸入封面圖片id後再儲存貼文。"
+                this.message = "請確保上傳檔案檔名不含底線(_)。務必先上傳圖片，並輸入封面圖片id後再儲存貼文。"
                 this.button = "新聞圖片上傳"
                 break
             case 'carousel':
-                this.message = "請選擇要上傳的圖片，上傳後預設會直接顯示於前台。"
+                this.message = "請確保上傳檔案檔名不含底線(_)。請選擇要上傳的圖片，上傳後預設會直接顯示於前台。"
                 this.button = "跑馬燈圖片上傳"
                 break
             case 'project':
-                this.message = "務必先上傳圖片，並輸入封面圖片id後再儲存專案。"
+                this.message = "請確保上傳檔案檔名不含底線(_)。務必先上傳圖片，並輸入封面圖片id後再儲存專案。"
                 this.button = "工程圖片上傳"
                 break    
         }
@@ -100,6 +100,7 @@ export default {
         // 編輯時會由xxxEdit.vue傳資料過來
         cloudItems: {
             handler(newCloudItems) {
+                console.log(newCloudItems)
                 if(newCloudItems != null) {
                     this.uploadedItems = newCloudItems
                     for (let x = 0; x < newCloudItems.length; x++) {
@@ -113,8 +114,9 @@ export default {
     methods: {
         uploadImage() {
             this.message = "上傳中";
-            UploadService.uploadImage(this.images, this.$props.source)
+            UploadService.uploadImage(this.images, this.source)
                 .then((response) => {
+                    console.log(response)
                     this.message = "";
                     for(let x = 0; x < response.length; x++) {
                         let uploadItem = {
@@ -123,12 +125,12 @@ export default {
                         }
                         this.uploadedItems.push(uploadItem);
                         // new, project要回傳id才能更新
-                        if (this.$props.source !== 'carousel') {
+                        if (this.source !== 'carousel') {
                             this.idArray.push(response[x].data.id);
                         }
                     }
                     // new, project要回傳id才能更新
-                    if (this.$props.source !== 'carousel') {
+                    if (this.source !== 'carousel') {
                         this.$emit('id-array-updated', this.idArray);
                     }
                     // carousel要重整頁面再次抓取資料庫的東西
@@ -168,7 +170,7 @@ export default {
             //     this.images.splice(indexInImages, 1)
             //     // const index = this.images.findIndex(item => {item.name})
             // }
-            http.delete('/' + this.$props.source + 'image/' + item.id + '/')
+            http.delete('/' + this.source + 'image/' + item.id + '/')
                 .then((response) => {
                     const indexInuploadedItems = this.uploadedItems.findIndex(file => file.id === item.id)
                     // console.log(this.uploadedItems.findIndex(file => file.name === item.name))
@@ -184,7 +186,7 @@ export default {
         },
         // uploadNewImage() {
         //     this.message = "上傳中";
-        //     UploadService.uploadImage(this.images, this.$props.source)
+        //     UploadService.uploadImage(this.images, this.source)
         //         .then((response) => {
         //             this.message = "";
         //             for(let x = 0; x < response.length; x++) {
@@ -211,7 +213,7 @@ export default {
         // },
         // uploadCarouselImage() {
         //     this.message = "上傳中";
-        //     UploadService.uploadImage(this.images, this.$props.source)
+        //     UploadService.uploadImage(this.images, this.source)
         //         .then((response) => {
         //             this.message = "";
         //             for(let x = 0; x < response.length; x++) {
@@ -239,7 +241,7 @@ export default {
         // },
         // uploadProjectImage() {
         //     this.message = "上傳中";
-        //     UploadService.uploadImage(this.images, this.$props.source)
+        //     UploadService.uploadImage(this.images, this.source)
         //         .then((response) => {
         //             this.message = "";
         //             for(let x = 0; x < response.length; x++) {

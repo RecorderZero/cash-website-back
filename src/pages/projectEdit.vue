@@ -44,7 +44,7 @@
                         ></v-textarea>
                     </v-col>
                     <v-col cols="12">
-                      <imageUploader source="project" @id-array-updated="handleIdArrayUpdate" />
+                      <imageUploader source="project" :cloudItems="cloudItems" @id-array-updated="handleIdArrayUpdate" />
                     </v-col>
                     <v-col cols="6">
                       <v-select
@@ -70,10 +70,12 @@
                         <v-select
                             label="參與者"
                             v-model="editedItem.employee"
-                            :items="employeeName"
+                            :items="employee"
+                            item-title="name"
                             multiple
                         ></v-select>
                     </v-col>
+                    <!-- {{ editedItem.employee }} -->
                     <!-- {{ employeeName }}
                     {{ employeeId }} -->
                     <v-col cols="12">
@@ -126,10 +128,9 @@
         </v-toolbar>
       </template>
       <template v-slot:item.actions="{ item }">
-        <!-- update待開發
         <v-icon class="me-2" size="small" @click="editItem(item)">
           mdi-pencil
-        </v-icon> -->
+        </v-icon>
         <v-icon size="small" @click="deleteItem(item)"> mdi-delete </v-icon>
       </template>
       <template v-slot:no-data>
@@ -145,9 +146,10 @@
     export default {
       data: () => ({
         classification: ['道路工程', '大地工程', '水利工程', '景觀工程'],
-        employeeName: [],
-        employeeId: [],
-        employeeIndex: [],
+        // employeeName: [],
+        // employeeId: [],
+        employee: [],
+        cloudItems: null,
         alertType: null,
         alertTitle: null,
         alertText: null,
@@ -162,6 +164,7 @@
           { title: '標題', key: 'title', sortable: false },
           { title: '分類', key: 'classification' },
           { title: '發佈日期', key: 'date' },
+          // 加上權限
           { title: '操作', key: 'actions', sortable: false },
         ],
         items: [],
@@ -209,8 +212,13 @@
                 const employeeInstance = response.data
                 // console.log(employeeInstance)
                 for(let x = 0; x < employeeInstance.length; x++) {
-                    this.employeeName.push(employeeInstance[x].name)
-                    this.employeeId.push(employeeInstance[x].id)
+                  let employee_instance = {
+                    name: employeeInstance[x].name,
+                    id: employeeInstance[x].id,
+                  }
+                  this.employee.push(employee_instance)
+                    // this.employeeName.push(employeeInstance[x].name)
+                    // this.employeeId.push(employeeInstance[x].id)
                 }
             })
             .catch(error => {console.log(error)})
@@ -235,7 +243,6 @@
               ':' + pad(Math.abs(tzo) % 60);
         },
         initialize() {
-            this.employeeIndex = [];
           let yourDate = new Date()
           this.editedItem.date = this.toIsoString(yourDate).split('T')[0]
           this.defaultItem.date = this.editedItem.date
@@ -251,10 +258,65 @@
             this.editedItem.imageUrl = null;
         },
   
-        editItem(item) {
-          this.editedId = item.id
-          this.editedItem = Object.assign({}, item)
-          this.dialog = true
+        async editItem(item) {
+          try {
+            // console.log('e1')
+            // console.log(this.editedItem)
+            this.editedId = item.id
+            // this.action = 'edit'
+            this.editedItem = Object.assign({}, item)
+            // js內建array是pass by reference，但我們其實要的是副本，才不會在不修改時出問題
+            this.editedItem.employee = item.employee.slice()
+            // console.log(this.editedItem.employee)
+            for (let x = 0; x < this.editedItem.employee.length; x++) {
+              const employeeId = this.editedItem.employee[x]
+              // const indexOfEmployee = this.employeeId.indexOf(employeeId)
+              // console.log('id:' + employeeId)
+              // console.log('index:' + indexOfEmployee)
+              // console.log(this.editedItem.employee[x])
+              // console.log(this.employeeName[indexOfEmployee])
+              this.editedItem.employee[x] = this.employee.find(employee => employee.id === employeeId).name
+              // console.log(this.employeeId.indexOf(employeeId))
+              // console.log('e2')
+              // console.log(this.editedItem.employee)
+            }
+            // console.log(this.editedItem)
+            this.editedItem.images = []
+            // console.log(this.editedItem)
+            const response = await http.get('/get_project_images_detail/' + item.id + '/')
+            this.formatResponse(response.data)
+            this.findImageUrlId()
+            this.dialog = true
+            // console.log('e3')
+            // console.log(this.editedItem)
+          } catch(error) {
+            console.log(error)
+          }
+        },
+
+        formatResponse(data) {
+          for(let x = 0; x < data.length; x++) {
+            const image_instance = data[x]
+            // console.log(image_instance)
+            this.editedItem.images.push({
+              imgUrl: decodeURI(image_instance.image),
+              id: image_instance.id
+            })
+          }
+          // console.log('images' + this.editedItem.images)
+          this.cloudItems = this.editedItem.images.slice()
+          // console.log('cloudItems:' + this.cloudItems)
+        },
+
+        findImageUrlId() {
+          const fileUrl = decodeURI(this.editedItem.imageUrl)
+          // console.log('filename:' + fileName)
+          // console.log(this.editedItem.images)
+          // console.log(this.editedItem.images.findIndex((file) => file.name === fileName))
+          this.editedItem.imageUrl = this.editedItem.images.find((file) => file.imgUrl === fileUrl).id
+          for (let x = 0; x < this.editedItem.images.length; x++) {
+            this.editedItem.images[x] = this.editedItem.images[x].id
+          }
         },
   
         deleteItem(item) {
@@ -281,11 +343,16 @@
         },
 
         close() {
+          // console.log('c1')
+          // console.log(this.editedItem)
+          // console.log(this.editedItem.employee)
           this.dialog = false
-          this.employeeIndex = []
           this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedId = -1
+          this.cloudItems = null
+          // console.log('c3')
+          // console.log(this.editedItem)
         })
         },
   
@@ -296,43 +363,64 @@
             this.editedId = -1
           })
         },
-
-        change() {
-            console.log("change")
-        },
   
         async save() {
-          // update待開發
-          // try {if (this.editedId > -1) {
-          //   //要改indexOf找id
-          //   //修改的邏輯還須調整
-          //   Object.assign(this.items[this.editedId], this.editedItem)
-          // } else {
           try {
-            const imageItem = await http.get('/projectimage/' + this.editedItem.imageUrl + '/')
-            // console.log(imageItem)
-            this.editedItem.imageUrl = imageItem.data.image
-            for(let x = 0; x < this.editedItem.employee.length; x++) {
-                let employee = this.editedItem.employee[x]
+              const imageItem = await http.get('/projectimage/' + this.editedItem.imageUrl + '/')
+              // console.log(imageItem)
+              let response = null
+              this.editedItem.imageUrl = imageItem.data.image
+              for(let x = 0; x < this.editedItem.employee.length; x++) {
+                let employeeName = this.editedItem.employee[x]
                 // console.log("employee:"+employee)
-                this.editedItem.employee[x] = this.employeeId[this.employeeIndexInOriginArray(employee)]
+                this.editedItem.employee[x] = this.employee.find(employee => employee.name === employeeName).id
+                // this.editedItem.employee[x] = this.employeeId[this.employeeIndexInOriginArray(employee)]
                 // console.log("id:"+this.editedItem.employee[x])
+              }
+              if (this.editedId > -1) {
+                response = await http.patch('/project/' + this.editedId + '/', this.editedItem)
+              } else {
+                response = await http.post('/project/', this.editedItem)
+              }
+              response = response.data
+              await UpdateData.updateRelatedProject(this.editedItem.images, response.id)
+              this.alertType = "success"
+              this.alertTitle = "儲存成功"
+              this.alertText = "編號：" + response.id + "標題：" + response.title + "已儲存"
+              this.initialize()
+            } catch(error) {
+              this.alertType = "error"
+              this.alertTitle = "儲存失敗"
+              this.alertText = error
             }
-            // this.editedItem.employee = []
-            let response = await http.post('/project/', this.editedItem)
-            response = response.data
-            await UpdateData.updateRelatedProject(this.editedItem.images, response.id)
-            this.alertType = "success"
-            this.alertTitle = "儲存成功"
-            this.alertText = "編號：" + response.id + "標題：" + response.title + "已儲存"
-            this.initialize()
-          } catch(error) {
-            this.alertType = "error"
-            this.alertTitle = "儲存失敗"
-            this.alertText = error
-          }
           this.close()
         },
+        //   try {
+        //     const imageItem = await http.get('/projectimage/' + this.editedItem.imageUrl + '/')
+        //     // console.log(imageItem)
+        //     this.editedItem.imageUrl = imageItem.data.image
+        //     for(let x = 0; x < this.editedItem.employee.length; x++) {
+        //         let employee = this.editedItem.employee[x]
+        //         // console.log("employee:"+employee)
+        //         this.editedItem.employee[x] = this.employeeId[this.employeeIndexInOriginArray(employee)]
+        //         // console.log("id:"+this.editedItem.employee[x])
+        //     }
+        //     // this.editedItem.employee = []
+        //     let response = await http.post('/project/', this.editedItem)
+        //     response = response.data
+        //     await UpdateData.updateRelatedProject(this.editedItem.images, response.id)
+        //     this.alertType = "success"
+        //     this.alertTitle = "儲存成功"
+        //     this.alertText = "編號：" + response.id + "標題：" + response.title + "已儲存"
+        //     this.initialize()
+        //   } catch(error) {
+        //     this.alertType = "error"
+        //     this.alertTitle = "儲存失敗"
+        //     this.alertText = error
+        //   }
+        //   this.close()
+        // },
+
         employeeIndexInOriginArray(employee) {
             // console.log("index:"+this.employeeName.indexOf(employee))
             return this.employeeName.indexOf(employee)

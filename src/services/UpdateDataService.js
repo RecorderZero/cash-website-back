@@ -46,6 +46,33 @@ class UpdateDataService {
         }
         return Promise.all(requests);
     }
+    updateOrder(images, carouselNeedToMove999) {
+        let requests = []
+        // 更新有顯示的
+        for (let x = 0; x < images.length; x++) {
+            let order = x + 1
+            let request = http.patch('/carouselimage/' + images[x].id + '/', {
+                'order': order
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            requests.push(request)
+        }
+        // 更新未顯示的
+        for (let x = 0; x < carouselNeedToMove999.length; x++) {
+            let request = http.patch('/carouselimage/' + carouselNeedToMove999[x].id + '/', {
+                'order': 999
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            requests.push(request)
+        }
+        return Promise.all(requests)
+    }
 }
 
 export default new UpdateDataService();

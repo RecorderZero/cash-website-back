@@ -16,8 +16,8 @@
         :icon="'$' + alertType"
         :title="alertTitle"
         >{{ alertText }}</v-alert>
-        items:{{ items }}<br>
-        idArray:{{ idArray }}
+        <!-- {{ items }} -->
+        <!-- {{ idArray }} -->
         <v-data-table
             :headers="headers"
             :items="items"
@@ -52,11 +52,11 @@
         </template>
         <template v-slot:item.displayornot="{ item }">
             <!-- {{ item }} -->
-            <v-checkbox v-model="item.displayornot" @change="appending(item)"></v-checkbox>
+            <v-checkbox v-model="item.displayornot" @change="appending(item.id, item.displayornot)"></v-checkbox>
         </template>
         <template v-slot:item.actions="{ item, index }">
             <v-icon size="large" @click="moveUpItem(item)" :disabled="(index === 0) || (item.displayornot === false)"> mdi-arrow-up-bold </v-icon>
-            <v-icon size="large" @click="moveDownItem(item)" :disabled="(index === (items.findIndex(item => item.displayornot === false) - 1)) || (item.displayornot === false) || (index === (this.items.length - 1))"> mdi-arrow-down-bold </v-icon>
+            <v-icon size="large" @click="moveDownItem(item)" :disabled="(index === items.length - 1) || (item.displayornot === false)"> mdi-arrow-down-bold </v-icon>
             <v-icon size="large" @click="deleteItem(item)"> mdi-delete </v-icon>
         </template>
         
@@ -84,7 +84,7 @@ import UpdateData from "../services/UpdateDataService"
         message: null,
         dialogDelete: false,
         headers: [
-          { title: '編號', key: 'id' },
+          // { title: '編號', key: 'id' },
           { title: '圖片', key: 'image', sortable: false },
           { title: '是否顯示', key: 'displayornot'},
           { title: '操作', key: 'actions', sortable: false },
@@ -118,34 +118,22 @@ import UpdateData from "../services/UpdateDataService"
                 this.items[x].image = decodeURI(this.items[x].image)
             }
         },
-        appending(item) {
-          // 將不顯示往下移動，顯示往上移動
-          const oldIndex = this.items.indexOf(item)
-          const moveItem = this.items.splice(oldIndex, 1)
-          let newIndex = this.items.findIndex(find => find.displayornot === false)
-          if (newIndex === -1) {
-            newIndex = this.items.length
-          }
-          // console.log(newIndex)
-          this.items.splice(newIndex, 0, moveItem[0])
+        appending(id, displayornot) {
             // console.log('id:'+id+'display'+displayornot)
             // console.log(this.idArray.findIndex(item => item.id === id))
-            // 稍後要跟後台更新的資料
-            if((this.idArray.findIndex(find => find.id === item.id)) === -1) {
+            if((this.idArray.findIndex(item => item.id === id)) === -1) {
                 this.idArray.push({
-                    id: item.id,
-                    displayornot: item.displayornot
+                    id: id,
+                    displayornot: displayornot
                 })
+                
             } else {
-                this.idArray.splice(this.idArray.findIndex(find => find.id === item.id),1)
+                this.idArray.splice(this.idArray.findIndex(item => item.id === id),1)
             }
         },
         async save() {
             try {
                 await UpdateData.updateDisplay(this.idArray)
-                const lastTrueInItems = this.items.findIndex(find => find.displayornot === false) - 1
-                const carouselNeedToMove999 = this.idArray.filter(find => find.displayornot === false)
-                await UpdateData.updateOrder(this.items.slice(0, lastTrueInItems + 1), carouselNeedToMove999)
                 this.alertType = 'success'
                 this.alertTitle = '儲存成功'
                 this.alertText = ""
@@ -169,10 +157,8 @@ import UpdateData from "../services/UpdateDataService"
           this.items.splice(oldIndex - 1, 0, moveItem[0])
         },
         moveDownItem(item) {
-          // console.log('movedown' + item.id)
-          const oldIndex = this.items.indexOf(item)
-          const moveItem = this.items.splice(oldIndex, 1)
-          this.items.splice(oldIndex + 1, 0, moveItem[0])
+          console.log('movedown' + item.id)
+
         },
   
         async deleteItemConfirm() {

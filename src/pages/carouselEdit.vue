@@ -1,10 +1,11 @@
+<!-- eslint-disable vue/valid-v-slot -->
 <template>
     <v-container>
         <v-alert
             color="info"
             icon="$info"
             title="使用說明"
-            text="如欲在前台顯示跑馬燈，請在對應欄位打勾，並點選'儲存顯示'"
+            text="如欲在前台顯示/不顯示跑馬燈，請在對應欄位打勾/取消，並點選'儲存顯示'。儲存完畢後再修改順序並儲存。"
             ></v-alert>
         <ImageUploader source="carousel"/>
         {{ message }}
@@ -15,6 +16,8 @@
         :icon="'$' + alertType"
         :title="alertTitle"
         >{{ alertText }}</v-alert>
+        <!-- {{ items }} -->
+        <!-- {{ idArray }} -->
         <v-data-table
             :headers="headers"
             :items="items"
@@ -44,12 +47,17 @@
           </v-dialog>
         </v-toolbar>
         </template>
+        <template v-slot:item.image="{ item }">
+          <v-img :src="item.image"></v-img>
+        </template>
         <template v-slot:item.displayornot="{ item }">
             <!-- {{ item }} -->
             <v-checkbox v-model="item.displayornot" @change="appending(item.id, item.displayornot)"></v-checkbox>
         </template>
-        <template v-slot:item.actions="{ item }">
-            <v-icon size="small" @click="deleteItem(item)"> mdi-delete </v-icon>
+        <template v-slot:item.actions="{ item, index }">
+            <v-icon size="large" @click="moveUpItem(item)" :disabled="(index === 0) || (item.displayornot === false)"> mdi-arrow-up-bold </v-icon>
+            <v-icon size="large" @click="moveDownItem(item)" :disabled="(index === items.length - 1) || (item.displayornot === false)"> mdi-arrow-down-bold </v-icon>
+            <v-icon size="large" @click="deleteItem(item)"> mdi-delete </v-icon>
         </template>
         
         <template v-slot:no-data>
@@ -76,8 +84,8 @@ import UpdateData from "../services/UpdateDataService"
         message: null,
         dialogDelete: false,
         headers: [
-          { title: '編號', key: 'id' },
-          { title: '檔名', key: 'image' },
+          // { title: '編號', key: 'id' },
+          { title: '圖片', key: 'image', sortable: false },
           { title: '是否顯示', key: 'displayornot'},
           { title: '操作', key: 'actions', sortable: false },
         ],
@@ -107,7 +115,7 @@ import UpdateData from "../services/UpdateDataService"
         fileNameParser() {
             for(let x = 0; x < this.items.length; x++) {
                 // console.log(this.items[x].image.split('/').slice(-1))
-                this.items[x].image = decodeURI(this.items[x].image.split('/').slice(-1))
+                this.items[x].image = decodeURI(this.items[x].image)
             }
         },
         appending(id, displayornot) {
@@ -140,6 +148,17 @@ import UpdateData from "../services/UpdateDataService"
         deleteItem(item) {
           this.dialogDelete = true
           this.editedId = item.id
+        },
+        moveUpItem(item) {
+          // console.log('moveup' + item.id)
+          // console.log(this.items.indexOf(item))
+          const oldIndex = this.items.indexOf(item)
+          const moveItem = this.items.splice(oldIndex, 1)
+          this.items.splice(oldIndex - 1, 0, moveItem[0])
+        },
+        moveDownItem(item) {
+          console.log('movedown' + item.id)
+
         },
   
         async deleteItemConfirm() {

@@ -5,9 +5,9 @@
             color="info"
             icon="$info"
             title="使用說明"
-            text="如欲在前台顯示/不顯示跑馬燈，請在對應欄位打勾/取消，並點選'儲存顯示'。儲存完畢後再修改順序並儲存。"
+            text="如欲在前台顯示/不顯示跑馬燈，請在對應欄位打勾/取消；欲調整跑馬燈順序請透過上下鍵調整，越上面的圖片將越早出現，調整完畢後記得點選'儲存顯示'。"
             ></v-alert>
-        <ImageUploader source="carousel"/>
+        <ImageUploader source="carousel" :cloudItems=null />
         {{ message }}
         <!-- {{ idArray }} -->
         <v-alert
@@ -178,6 +178,23 @@ import UpdateData from "../services/UpdateDataService"
         async deleteItemConfirm() {
             try {
                 await http.delete('/carouselimage/' + this.editedId + '/')
+                // 如果刪除的是顯示的carousel，則將後面displayornot == true的carousel其order都更新
+                const indexOfDelete = this.items.findIndex(find => find.id === this.editedId)
+                if (this.items[indexOfDelete].displayornot) {
+                  let requests = []
+                  for(let x = indexOfDelete + 1; this.items[x].displayornot; x++) {
+                    let carousel_instance = this.items[x]
+                    let request = http.patch('/carouselimage/' + carousel_instance.id + '/', {
+                      'order': carousel_instance.order - 1
+                    }, {
+                      headers: {
+                        'Content-Type': 'multipart/form-data'
+                      }
+                    })
+                    requests.push(request)
+                  }
+                  await Promise.all(requests)
+                }
                 this.initialize()
                 this.alertType = "success"
                 this.alertTitle = "刪除成功"

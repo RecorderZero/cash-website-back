@@ -18,18 +18,6 @@
                     {{ button }}
                     <v-icon right dark>mdi-cloud-upload</v-icon>
                 </v-btn>
-                <!-- <v-btn v-if="source === 'new'" color="success" :disabled="!images" dark small @click="uploadNewImage">
-                    新聞圖片上傳
-                    <v-icon right dark>mdi-cloud-upload</v-icon>
-                </v-btn>
-                <v-btn v-if="source === 'carousel'" color="success" :disabled="!images" dark small @click="uploadCarouselImage">
-                    跑馬燈圖片上傳
-                    <v-icon right dark>mdi-cloud-upload</v-icon>
-                </v-btn>
-                <v-btn v-if="source === 'project'" color="success" :disabled="!images" dark small @click="uploadProjectImage">
-                    工程圖片上傳
-                    <v-icon right dark>mdi-cloud-upload</v-icon>
-                </v-btn> -->
             </v-col>
         </v-row>
         <v-card>
@@ -43,15 +31,6 @@
                     >刪除</v-btn>
                 </v-col>
             </v-row>
-            <!-- <v-list v-if="uploadedItems.length !== 0">
-                <v-list-item v-for="(item, index) in uploadedItems" :key="index">
-                    圖片：{{ item.name }}已上傳，id{{ item.id }}
-                    <v-btn
-                        color="error"
-                        @click="deleteItem(item)"
-                    >刪除</v-btn>
-                </v-list-item>
-            </v-list> -->
             <v-card-text v-else>{{ message }}</v-card-text>
             <!-- images:{{ images }}
             uploadedItems:{{ uploadedItems }}
@@ -83,7 +62,7 @@ export default {
     created() {
         switch (this.$props.source) {
             case 'new':
-                this.message = "務必先上傳圖片，並輸入封面圖片id後再儲存貼文。"
+                this.message = "務必先上傳圖片，並輸入封面圖片id後再儲存貼文。若有順序需求請按先後順序一張一張上傳。"
                 this.button = "新聞圖片上傳"
                 break
             case 'carousel':
@@ -91,7 +70,7 @@ export default {
                 this.button = "跑馬燈圖片上傳"
                 break
             case 'project':
-                this.message = "務必先上傳圖片，並輸入封面圖片id後再儲存專案。"
+                this.message = "務必先上傳圖片，並輸入封面圖片id後再儲存專案。若有順序需求請按先後順序一張一張上傳。"
                 this.button = "工程圖片上傳"
                 break    
         }
@@ -157,17 +136,6 @@ export default {
                 })
         },
         deleteItem(item) {
-            // console.log(item.id)
-            // console.log(item.name)
-            // console.log(this.images[0])
-            // if(item.name.includes('_')) {
-            //     const originalName = item.name.split('_')[0]
-            //     // console.log(originalName)
-            //     // console.log(this.images.findIndex(file => file.name.includes(originalName)))
-            //     const indexInImages = this.images.findIndex(file => file.name.includes(originalName))
-            //     this.images.splice(indexInImages, 1)
-            //     // const index = this.images.findIndex(item => {item.name})
-            // }
             http.delete('/' + this.$props.source + 'image/' + item.id + '/')
                 .then(() => {
                     const indexInuploadedItems = this.uploadedItems.findIndex(file => file.id === item.id)
@@ -182,88 +150,6 @@ export default {
                 })
 
         },
-        // uploadNewImage() {
-        //     this.message = "上傳中";
-        //     UploadService.uploadImage(this.images, this.$props.source)
-        //         .then((response) => {
-        //             this.message = "";
-        //             for(let x = 0; x < response.length; x++) {
-        //                 this.uploadItems.push("圖片" + decodeURI(response[x].data.image.split('/').slice(-1)) + "已上傳，id" + response[x].data.id);
-        //                 this.idArray.push(response[x].data.id);
-        //             }
-        //             this.$emit('id-array-updated', this.idArray);
-        //         })
-        //         .catch(error => {
-        //             if (error.response) {
-        //                 // 在控制台顯示後端返回的詳細錯誤訊息
-        //                 console.log(error.response.data);
-        //                 console.log(error.response.status);
-        //                 console.log(error.response.headers);
-        //                 // 將錯誤訊息顯示在用戶界面上
-        //                 this.message = error.response.data.detail || '發生了未知錯誤';
-        //             } else {
-        //                 // 處理其他類型的錯誤
-        //                 console.error('錯誤訊息:', error.message);
-        //             }
-        //             this.images = null;
-        //             this.uploadItems = [];
-        //         })
-        // },
-        // uploadCarouselImage() {
-        //     this.message = "上傳中";
-        //     UploadService.uploadImage(this.images, this.$props.source)
-        //         .then((response) => {
-        //             this.message = "";
-        //             for(let x = 0; x < response.length; x++) {
-        //                 this.uploadItems.push("圖片" + decodeURI(response[x].data.image.split('/').slice(-1)) + "已上傳，id" + response[x].data.id);
-        //             }
-        //             this.$nextTick(() => {
-        //                 location.reload();
-        //             })
-        //         })
-        //         .catch(error => {
-        //             if (error.response) {
-        //                 // 在控制台顯示後端返回的詳細錯誤訊息
-        //                 console.log(error.response.data);
-        //                 console.log(error.response.status);
-        //                 console.log(error.response.headers);
-        //                 // 將錯誤訊息顯示在用戶界面上
-        //                 this.message = error.response.data.detail || '發生了未知錯誤';
-        //             } else {
-        //                 // 處理其他類型的錯誤
-        //                 console.error('錯誤訊息:', error.message);
-        //             }
-        //             this.images = null;
-        //             this.uploadItems = [];
-        //         })
-        // },
-        // uploadProjectImage() {
-        //     this.message = "上傳中";
-        //     UploadService.uploadImage(this.images, this.$props.source)
-        //         .then((response) => {
-        //             this.message = "";
-        //             for(let x = 0; x < response.length; x++) {
-        //                 this.uploadItems.push("圖片" + decodeURI(response[x].data.image.split('/').slice(-1)) + "已上傳，id" + response[x].data.id);
-        //                 this.idArray.push(response[x].data.id);
-        //             }
-        //             this.$emit('id-array-updated', this.idArray);
-        //         })
-        //         .catch(error => {
-        //             if (error.response) {
-        //                 // 在控制台顯示後端返回的詳細錯誤訊息
-        //                 console.log(error.response.data);
-        //                 console.log(error.response.status);
-        //                 console.log(error.response.headers);
-        //                 // 將錯誤訊息顯示在用戶界面上
-        //                 this.message = error.response.data.detail || '發生了未知錯誤';
-        //             } else {
-        //                 // 處理其他類型的錯誤
-        //                 console.error('錯誤訊息:', error.message);
-        //             }
-        //             this.images = null;
-        //             this.uploadItems = [];
-        //         })
-        // },
     },
 }
 </script>

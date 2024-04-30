@@ -78,15 +78,17 @@
                     <!-- {{ editedItem.employee }} -->
                     <!-- {{ employeeName }}
                     {{ employeeId }} -->
-                    <v-col cols="12">
+                    <v-col cols="6">
                       <v-text-field
-                        v-model="editedItem.date"
-                        label="日期(yyyy-mm-dd)"
+                        v-model="editedItem.startDate"
+                        label="開工日期(yyyy-mm-dd)"
                         ></v-text-field>
-                        <!-- <v-date-picker
-                            color="primary"
-                            v-model="editedItem.date"
-                        ></v-date-picker> -->
+                    </v-col>
+                    <v-col cols="6">
+                      <v-text-field
+                        v-model="editedItem.endDate"
+                        label="完工日期(yyyy-mm-dd)"
+                        ></v-text-field>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -163,7 +165,7 @@
           },
           { title: '標題', key: 'title', sortable: false },
           { title: '分類', key: 'classification' },
-          { title: '發佈日期', key: 'date' },
+          { title: '完工日期', key: 'endDate' },
           // 加上權限
           { title: '操作', key: 'actions', sortable: false },
         ],
@@ -177,7 +179,8 @@
           employee: [],
           location: null,
           classification: null,
-          date: null,
+          startDate: null,
+          endDate: null,
         },
         defaultItem: {
           title: null,
@@ -187,7 +190,8 @@
           employee: [],
           location: null,
           classification: null,
-          date: null,
+          startDate: null,
+          endDate: null,
         },
       }),
   
@@ -244,8 +248,10 @@
         },
         initialize() {
           let yourDate = new Date()
-          this.editedItem.date = this.toIsoString(yourDate).split('T')[0]
-          this.defaultItem.date = this.editedItem.date
+          this.editedItem.startDate = this.toIsoString(yourDate).split('T')[0]
+          this.editedItem.endDate = this.editedItem.startDate
+          this.defaultItem.startDate = this.editedItem.startDate
+          this.defaultItem.endDate = this.editedItem.startDate
           // console.log(yourDate)
           // console.log(this.editedItem.date)
           http.get('/project/')
@@ -392,6 +398,7 @@
               this.alertType = "error"
               this.alertTitle = "儲存失敗"
               this.alertText = error
+              console.log(error)
             }
           this.close()
         },

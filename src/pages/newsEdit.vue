@@ -327,24 +327,6 @@
               this.alertTitle = "儲存失敗"
               this.alertText = error
             }
-          // } else {
-          //   try {
-          //   const imageItem = await http.get('/newimage/' + this.editedItem.imageUrl + '/')
-          //   // console.log(imageItem)
-          //   this.editedItem.imageUrl = imageItem.data.image
-          //   let response = await http.post('/new/', this.editedItem)
-          //   response = response.data
-          //   await UpdateData.updateRelatedNew(this.editedItem.images, response.id)
-          //   this.alertType = "success"
-          //   this.alertTitle = "儲存成功"
-          //   this.alertText = "編號：" + response.id + "標題：" + response.title + "已儲存"
-          //   this.initialize()
-          //   } catch(error) {
-          //     this.alertType = "error"
-          //     this.alertTitle = "儲存失敗"
-          //     this.alertText = error
-          //   }
-          // }
           this.close()
         },
       },

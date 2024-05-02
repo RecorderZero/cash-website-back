@@ -7,7 +7,7 @@
             title="使用說明"
             text="如欲在前台顯示/不顯示跑馬燈，請在對應欄位打勾/取消；欲調整跑馬燈順序請透過上下鍵調整，越上面的圖片將越早出現，調整完畢後記得點選'儲存顯示'。"
             ></v-alert>
-        <ImageUploader source="carousel" :cloudItems=null />
+        <ImageUploader v-if="Authentication().add(userRole)" source="carousel" :cloudItems=null />
         {{ message }}
         <!-- {{ idArray }} -->
         <v-alert
@@ -16,8 +16,8 @@
         :icon="'$' + alertType"
         :title="alertTitle"
         >{{ alertText }}</v-alert>
-        items:{{ items }}<br>
-        idArray:{{ idArray }}
+        <!-- items:{{ items }}<br>
+        idArray:{{ idArray }} -->
         <v-data-table
             :headers="headers"
             :items="items"
@@ -52,12 +52,12 @@
         </template>
         <template v-slot:item.displayornot="{ item }">
             <!-- {{ item }} -->
-            <v-checkbox v-model="item.displayornot" @change="appending(item)"></v-checkbox>
+            <v-checkbox v-model="item.displayornot" @change="appending(item)" :disabled="!Authentication().modify(userRole)"></v-checkbox>
         </template>
         <template v-slot:item.actions="{ item, index }">
-            <v-icon size="large" @click="moveUpItem(item)" :disabled="(index === 0) || (item.displayornot === false)"> mdi-arrow-up-bold </v-icon>
-            <v-icon size="large" @click="moveDownItem(item)" :disabled="(index === (items.findIndex(item => item.displayornot === false) - 1)) || (item.displayornot === false) || (index === (this.items.length - 1))"> mdi-arrow-down-bold </v-icon>
-            <v-icon size="large" @click="deleteItem(item)"> mdi-delete </v-icon>
+            <v-icon v-if="Authentication().modify(userRole)"  size="large" @click="moveUpItem(item)" :disabled="(index === 0) || (item.displayornot === false)"> mdi-arrow-up-bold </v-icon>
+            <v-icon v-if="Authentication().modify(userRole)" size="large" @click="moveDownItem(item)" :disabled="(index === (items.findIndex(item => item.displayornot === false) - 1)) || (item.displayornot === false) || (index === (this.items.length - 1))"> mdi-arrow-down-bold </v-icon>
+            <v-icon v-if="Authentication().delete(userRole)" size="large" @click="deleteItem(item)"> mdi-delete </v-icon>
         </template>
         
         <template v-slot:no-data>
@@ -73,9 +73,13 @@
 <script>
 import http from "../http-common"
 import UpdateData from "../services/UpdateDataService"
+import Authentication from "../services/Authentication"
+
   export default {
     data() {
       return {
+        userName: localStorage.getItem('userName'),
+        userRole: localStorage.getItem('userRole'),
         editedId: -1,
         alertType: null,
         alertTitle: null,
@@ -101,6 +105,9 @@ import UpdateData from "../services/UpdateDataService"
         this.initialize()
     },
     methods: {
+        Authentication() {
+          return Authentication; // 返回Authentication對象
+        },
         async initialize() {
             this.idArray = [];
             await http.get('/carouselimage/')

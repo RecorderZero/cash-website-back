@@ -60,7 +60,7 @@ const buttons = [
         <v-app-bar-title>
             後臺
         </v-app-bar-title>
-
+        <!-- {{ userName }} -->
         <!-- 電腦導航欄 -->
         <v-spacer v-if="mobile"></v-spacer>
         <v-btn-toggle v-model="pageTitle" v-if="!mobile">
@@ -91,12 +91,15 @@ const buttons = [
             </v-btn>
             </template>
             <v-list>
-                <v-list-item to="/login">
-                    <v-list-item-title>登入後臺</v-list-item-title>
+                <!-- <v-list-item v-if="!userName" to="/login">
+                    <v-list-item-title>登入</v-list-item-title>
+                </v-list-item> -->
+                <v-list-item @click="logout">
+                    <v-list-item-title>登出</v-list-item-title>
                 </v-list-item>
-                <v-list-item to="/register">
+                <!-- <v-list-item to="/register">
                     <v-list-item-title>註冊帳號</v-list-item-title>
-                </v-list-item>
+                </v-list-item> -->
             </v-list>
             <!-- <v-card>
             <v-card-text>
@@ -144,3 +147,24 @@ const buttons = [
         </v-menu> -->
     </v-app-bar>
 </template>
+
+<script>
+import router from '@/router';
+
+export default {
+    data() {
+        return {
+            userName: localStorage.getItem('userName')
+        }
+    },
+    methods: {
+        logout() {
+            localStorage.removeItem('userName')
+            localStorage.removeItem('userRole')
+            router.push({ name: 'Login' })
+            // console.log("logout")
+        }
+    },
+
+}
+</script>

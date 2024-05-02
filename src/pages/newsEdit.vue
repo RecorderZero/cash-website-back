@@ -19,7 +19,7 @@
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog">
             <template v-slot:activator="{ props }">
-              <v-btn color="primary" dark v-bind="props">
+              <v-btn v-if="Authentication().add(userRole)" color="primary" dark v-bind="props">
                 新增
               </v-btn>
             </template>
@@ -112,10 +112,10 @@
         </v-toolbar>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-icon class="me-2" size="small" @click="editItem(item)">
+        <v-icon v-if="Authentication().modify(userRole)" class="me-2" size="small" @click="editItem(item)">
           mdi-pencil
         </v-icon>
-        <v-icon size="small" @click="deleteItem(item)"> mdi-delete </v-icon>
+        <v-icon v-if="Authentication().delete(userRole)" size="small" @click="deleteItem(item)"> mdi-delete </v-icon>
       </template>
       <template v-slot:no-data>
         無資料
@@ -127,8 +127,12 @@
   <script>
   import http from "../http-common"
   import UpdateData from "../services/UpdateDataService"
+  import Authentication from "../services/Authentication"
+
     export default {
       data: () => ({
+        userName: localStorage.getItem('userName'),
+        userRole: localStorage.getItem('userRole'),
         classification: ['竣工', '榮譽', '活動'],
         cloudItems: null,
         alertType: null,
@@ -189,6 +193,9 @@
       },
   
       methods: {
+        Authentication() {
+          return Authentication; // 返回Authentication對象
+        },
         toIsoString(date) {
           var tzo = -date.getTimezoneOffset(),
               dif = tzo >= 0 ? '+' : '-',

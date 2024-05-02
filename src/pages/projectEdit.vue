@@ -17,9 +17,10 @@
           <v-toolbar-title>工程一覽</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
+          <!-- {{ userRole }} -->
           <v-dialog v-model="dialog">
             <template v-slot:activator="{ props }">
-              <v-btn color="primary" dark v-bind="props">
+              <v-btn v-if="Authentication().add(userRole)" color="primary" dark v-bind="props">
                 新增
               </v-btn>
             </template>
@@ -130,10 +131,10 @@
         </v-toolbar>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-icon class="me-2" size="small" @click="editItem(item)">
+        <v-icon v-if="Authentication().modify(userRole)" class="me-2" size="small" @click="editItem(item)">
           mdi-pencil
         </v-icon>
-        <v-icon size="small" @click="deleteItem(item)"> mdi-delete </v-icon>
+        <v-icon v-if="Authentication().delete(userRole)" size="small" @click="deleteItem(item)"> mdi-delete </v-icon>
       </template>
       <template v-slot:no-data>
         無資料
@@ -142,11 +143,15 @@
     </v-container>
   </template>
   
-  <script>
+<script>
   import http from "../http-common"
   import UpdateData from "../services/UpdateDataService"
+  import Authentication from "../services/Authentication"
+
     export default {
       data: () => ({
+        userName: localStorage.getItem('userName'),
+        userRole: localStorage.getItem('userRole'),
         classification: ['道路工程', '大地工程', '水利工程', '景觀工程'],
         // employeeName: [],
         // employeeId: [],
@@ -166,7 +171,6 @@
           { title: '標題', key: 'title', sortable: false },
           { title: '分類', key: 'classification' },
           { title: '完工日期', key: 'endDate' },
-          // 加上權限
           { title: '操作', key: 'actions', sortable: false },
         ],
         items: [],
@@ -230,6 +234,9 @@
       },
   
       methods: {
+        Authentication() {
+          return Authentication; // 返回Authentication對象
+        },
         toIsoString(date) {
           var tzo = -date.getTimezoneOffset(),
               dif = tzo >= 0 ? '+' : '-',

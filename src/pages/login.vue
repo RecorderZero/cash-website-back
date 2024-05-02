@@ -60,7 +60,7 @@ export default {
     //       router.push({ name: 'ForgotPassword' })
     //   },
     register() {
-        router.replace('/register')
+        router.push('/register')
     },
     async login() {
         http.get('/verify/', { params: this.user })
@@ -69,7 +69,7 @@ export default {
                 const user = responce.data
                 localStorage.setItem('userName', user.name)
                 localStorage.setItem('userRole', user.role)
-                router.replace('/dashboard')
+                router.push('/dashboard')
             })
             .catch(error => {
                 console.log(error)

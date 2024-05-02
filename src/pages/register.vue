@@ -71,11 +71,11 @@ export default {
         dialogTitle: null,
         dialogText: null,
         registerData: {
-            name: '',
-            email: 'asd@djsaios.com',
-            account: 'aaa',
-            password: 'az135790',
-            confirmPassword: 'az135790',
+            name: null,
+            email: null,
+            account: null,
+            password: null,
+            confirmPassword: null,
         },
         // terms: false,
     }),
@@ -130,7 +130,7 @@ export default {
         },
         confirm() {
             if (this.status === 201) {
-                router.push({ name: "Login" })
+                router.push("/login")
             }
             this.dialog = false
         },

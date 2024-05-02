@@ -161,7 +161,7 @@ export default {
         logout() {
             localStorage.removeItem('userName')
             localStorage.removeItem('userRole')
-            router.push({ name: 'Login' })
+            router.push('/login')
             // console.log("logout")
         }
     },

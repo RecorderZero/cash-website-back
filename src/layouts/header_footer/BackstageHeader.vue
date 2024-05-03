@@ -31,7 +31,7 @@ const buttons = [
         value: 'newsEdit',
         text: '修改最新消息',
         icon: 'mdi-newspaper-variant',
-        textClass: 'text-brown-darken-1',
+        textClass: 'text-blue-darken-1',
         to: '/newsEdit',
     },
     {

@@ -133,7 +133,7 @@
       data: () => ({
         userName: localStorage.getItem('userName'),
         userRole: localStorage.getItem('userRole'),
-        classification: ['竣工', '榮譽', '活動'],
+        classification: ['獲獎榮耀', '公司活動', '教育訓練'],
         cloudItems: null,
         alertType: null,
         alertTitle: null,
@@ -324,6 +324,7 @@
                 response = await http.post('/new/', this.editedItem)
               }
               response = response.data
+              // 好像沒有必要全更新，應該只要更新非null即可
               await UpdateData.updateRelatedNew(this.editedItem.images, response.id)
               this.alertType = "success"
               this.alertTitle = "儲存成功"

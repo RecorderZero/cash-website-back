@@ -153,7 +153,7 @@
       data: () => ({
         userName: localStorage.getItem('userName'),
         userRole: localStorage.getItem('userRole'),
-        classification: ['道路工程', '大地工程', '水利工程', '景觀工程'],
+        classification: ['道路工程', '大地工程', '水利工程', '水保工程', '景觀工程'],
         // employeeName: [],
         // employeeId: [],
         // employee: [],

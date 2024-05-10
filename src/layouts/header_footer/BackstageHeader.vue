@@ -16,29 +16,36 @@ const buttons = [
     {
         value: 'dashboard',
         text: '首頁',
-        icon: 'mdi-home',
-        textClass: 'text-green',
+        // icon: 'mdi-home',
+        // textClass: 'text-green',
         to: '/dashboard',
     },
     {
         value: 'carouselEdit',
         text: '修改跑馬燈',
-        icon: 'mdi-view-carousel',
-        textClass: 'text-brown-darken-1',
+        // icon: 'mdi-view-carousel',
+        // textClass: 'text-brown-darken-1',
         to: '/carouselEdit',
+    },
+    {
+        value: 'awardEdit',
+        text: '修改歷年獲獎',
+        // icon: 'mdi-hammer',
+        // textClass: 'text-red',
+        to: '/awardEdit',
     },
     {
         value: 'newsEdit',
         text: '修改最新消息',
-        icon: 'mdi-newspaper-variant',
-        textClass: 'text-blue-darken-1',
+        // icon: 'mdi-newspaper-variant',
+        // textClass: 'text-blue-darken-1',
         to: '/newsEdit',
     },
     {
         value: 'projectEdit',
         text: '修改工程實績',
-        icon: 'mdi-hammer',
-        textClass: 'text-red',
+        // icon: 'mdi-hammer',
+        // textClass: 'text-red',
         to: '/projectEdit',
     },
 ];
@@ -64,9 +71,9 @@ const buttons = [
         <!-- 電腦導航欄 -->
         <v-spacer v-if="mobile"></v-spacer>
         <v-btn-toggle v-model="pageTitle" v-if="!mobile">
-            <v-btn v-for="button in buttons" :key="button.value" rounded="xl" size="large" :class="button.textClass"
+            <v-btn v-for="button in buttons" :key="button.value" rounded="xl" size="large"
                 :value="button.value" :to="button.to">
-                <v-icon :icon="button.icon" />
+                <!-- <v-icon :icon="button.icon" /> -->
                 <span>{{ button.text }}</span>
             </v-btn>
         </v-btn-toggle>
@@ -80,7 +87,7 @@ const buttons = [
             </template>
 
             <v-list>
-                <v-list-item v-for="button in buttons" :key="button.value" :class="button.textClass" :value="button.value"  :prepend-icon="button.icon" :to="button.to">
+                <v-list-item v-for="button in buttons" :key="button.value" :value="button.value" :to="button.to">
                     <v-list-item-title>{{ button.text }}</v-list-item-title>
                 </v-list-item>
             </v-list>

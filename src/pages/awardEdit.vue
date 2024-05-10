@@ -14,7 +14,7 @@
     >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>貼文一覽</v-toolbar-title>
+          <v-toolbar-title>獎項一覽</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog">
@@ -39,43 +39,9 @@
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.subtitle"
-                        label="左標題"
-                      ></v-text-field>
-                    </v-col>
-                    <!-- <v-col cols="12">
-                      <v-textarea 
-                        v-model="editedItem.content"
-                        label="內容"
-                        ></v-textarea>
-                    </v-col> -->
-                    <v-col cols="12">
-                      <imageUploader source="new" :cloudItems="cloudItems" @id-array-updated="handleIdArrayUpdate" />
-                    </v-col>
-                    <v-col cols="6">
-                      <v-select
-                        label="封面圖片id"
-                        v-model="editedItem.imageUrl"
-                        :items="editedItem.images"
-                      ></v-select>
-                      <!-- {{ editedItem.images }} -->
-                    </v-col>
-                    <v-col cols="6">
-                        <v-select
-                            label="類別"
-                            v-model="editedItem.classification"
-                            :items="classification"
-                        ></v-select>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-text-field
                         v-model="editedItem.date"
                         label="日期(yyyy-mm-dd)"
                         ></v-text-field>
-                        <!-- <v-date-picker
-                            color="primary"
-                            v-model="editedItem.date"
-                        ></v-date-picker> -->
                     </v-col>
                   </v-row>
                   <!-- {{ editedItem }} -->
@@ -98,7 +64,7 @@
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
               <v-card-title class="text-h5"
-                >確定要刪除此貼文？</v-card-title
+                >確定要刪除此獎項？</v-card-title
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -132,52 +98,35 @@
   
   <script>
   import http from "../http-common"
-  import UpdateData from "../services/UpdateDataService"
   import Authentication from "../services/Authentication"
 
     export default {
       data: () => ({
         userName: localStorage.getItem('userName'),
         userRole: localStorage.getItem('userRole'),
-        classification: ['獲獎榮耀', '公司活動', '教育訓練'],
-        cloudItems: null,
         alertType: null,
         alertTitle: null,
         alertText: null,
         dialog: false,
         dialogDelete: false,
         headers: [
-          {
-            title: '編號',
-            align: 'start',
-            key: 'id',
-          },
-          { title: '標題', key: 'title', sortable: false },
-          { title: '左標題', key: 'subtitle', sortable: false },
-          { title: '分類', key: 'classification' },
-          { title: '發佈日期', key: 'date' },
+          { title: '編號', align: 'start', key: 'id',},
+          { title: '標題', key: 'title' },
+          { title: '年度', key: 'year' },
+          { title: '日期', key: 'date' },
           // 加上權限
           { title: '操作', key: 'actions', sortable: false },
         ],
         items: [],
-        // action: 'add',
         editedId: -1,
         editedItem: {
           title: null,
-          subtitle: null,
-          content: null,
-          imageUrl: null,
-          images: [],
-          classification: null,
+          year: null,
           date: null,
         },
         defaultItem: {
           title: null,
-          subtitle: null,
-          content: null,
-          imageUrl: null,
-          images: [],
-          classification: null,
+          year: null,
           date: null,
         },
       }),
@@ -227,14 +176,9 @@
           this.defaultItem.date = this.editedItem.date
           // console.log(yourDate)
           // console.log(this.editedItem.date)
-          http.get('/new/')
+          http.get('/award/')
             .then(response => {this.items = response.data})
             .catch(error => {console.log(error)})
-        },
-
-        handleIdArrayUpdate(idArray) {
-            this.editedItem.images = idArray;
-            this.editedItem.imageUrl = null;
         },
   
         async editItem(item) {
@@ -243,42 +187,12 @@
             // this.action = 'edit'
             this.editedItem = Object.assign({}, item)
             // console.log(this.editedItem)
-            this.editedItem.images = []
-            // console.log(this.editedItem)
-            const response = await http.get('/get_new_images_detail/' + item.id + '/')
-            this.formatResponse(response.data)
-            this.findImageUrlId()
             this.dialog = true
           } catch(error) {
             console.log(error)
           }
         },
-
-        formatResponse(data) {
-          for(let x = 0; x < data.length; x++) {
-            const image_instance = data[x]
-            // console.log(image_instance)
-            this.editedItem.images.push({
-              imgUrl: decodeURI(image_instance.image),
-              id: image_instance.id
-            })
-          }
-          // console.log('images' + this.editedItem.images)
-          this.cloudItems = this.editedItem.images.slice()
-          // console.log('cloudItems:' + this.cloudItems)
-        },
-
-        findImageUrlId() {
-          const fileUrl = decodeURI(this.editedItem.imageUrl)
-          // console.log('filename:' + fileName)
-          // console.log(this.editedItem.images)
-          // console.log(this.editedItem.images.findIndex((file) => file.name === fileName))
-          this.editedItem.imageUrl = this.editedItem.images.find((file) => file.imgUrl === fileUrl).id
-          for (let x = 0; x < this.editedItem.images.length; x++) {
-            this.editedItem.images[x] = this.editedItem.images[x].id
-          }
-        },
-  
+        
         deleteItem(item) {
           this.editedId = item.id
           this.editedItem = Object.assign({}, item)
@@ -287,7 +201,7 @@
   
         async deleteItemConfirm() {
             try {
-                await http.delete('/new/' + this.editedId + '/')
+                await http.delete('/award/' + this.editedId + '/')
                 this.initialize()
                 this.alertType = "success"
                 this.alertTitle = "刪除成功"
@@ -307,7 +221,6 @@
           this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedId = -1
-          this.cloudItems = null
           // this.action = 'add'
         })
         },
@@ -319,22 +232,16 @@
             this.editedId = -1
           })
         },
-  
         async save() {
-          // if (this.editedId > -1) {
-            try {
-              const imageItem = await http.get('/newimage/' + this.editedItem.imageUrl + '/')
-              // console.log(imageItem)
-              let response = null
-              this.editedItem.imageUrl = imageItem.data.image
+        try {
+                let response = null
+                this.editedItem.year = this.editedItem.date.split('-')[0] - 1911
               if (this.editedId > -1) {
-                response = await http.patch('/new/' + this.editedId + '/', this.editedItem)
+                response = await http.patch('/award/' + this.editedId + '/', this.editedItem)
               } else {
-                response = await http.post('/new/', this.editedItem)
+                response = await http.post('/award/', this.editedItem)
               }
               response = response.data
-              // 好像沒有必要全更新，應該只要更新非null即可
-              await UpdateData.updateRelatedNew(this.editedItem.images, response.id)
               this.alertType = "success"
               this.alertTitle = "儲存成功"
               this.alertText = "編號：" + response.id + "標題：" + response.title + "已儲存"

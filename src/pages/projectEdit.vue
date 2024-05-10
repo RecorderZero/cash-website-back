@@ -39,6 +39,12 @@
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12">
+                      <v-text-field
+                        v-model="editedItem.subtitle"
+                        label="左標題"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12">
                       <v-textarea 
                         v-model="editedItem.content"
                         label="內容"
@@ -170,6 +176,7 @@
             key: 'id',
           },
           { title: '標題', key: 'title', sortable: false },
+          { title: '左標題', key: 'subtitle', sortable: false },
           { title: '分類', key: 'classification' },
           { title: '完工日期', key: 'endDate' },
           { title: '操作', key: 'actions', sortable: false },
@@ -178,6 +185,7 @@
         editedId: -1,
         editedItem: {
           title: null,
+          subtitle: null,
           content: null,
           imageUrl: null,
           images: [],
@@ -189,6 +197,7 @@
         },
         defaultItem: {
           title: null,
+          subtitle: null,
           content: null,
           imageUrl: null,
           images: [],

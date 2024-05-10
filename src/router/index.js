@@ -79,6 +79,21 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/awardEdit',
+    component: () => import('@/layouts/sandwich/BackstageLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'AwardEdit',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "projectEdit" */ '@/pages/awardEdit.vue'),
+        meta: { requiresAuth: true },
+      },
+    ],
+  },
   // {
   //   path: '/upload',
   //   component: () => import('@/layouts/sandwich/BackstageLayout.vue'),

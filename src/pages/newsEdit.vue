@@ -160,7 +160,6 @@
           { title: '操作', key: 'actions', sortable: false },
         ],
         items: [],
-        // action: 'add',
         editedId: -1,
         editedItem: {
           title: null,
@@ -308,7 +307,6 @@
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedId = -1
           this.cloudItems = null
-          // this.action = 'add'
         })
         },
   

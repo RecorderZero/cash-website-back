@@ -73,6 +73,23 @@ class UpdateDataService {
         }
         return Promise.all(requests)
     }
+    updateResource(resource) {
+        let requests = [];
+        
+        for (let x = 0; x < resource.length; x++) {
+            let resource_instance = resource[x]
+            let request = http.patch('/membercount/' + resource_instance.id + '/', {
+                'position': resource_instance.position,
+                'count': resource_instance.count,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            requests.push(request);
+        }
+        return Promise.all(requests);
+    }
 }
 
 export default new UpdateDataService();

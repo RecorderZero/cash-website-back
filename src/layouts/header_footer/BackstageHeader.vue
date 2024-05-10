@@ -35,6 +35,13 @@ const buttons = [
         to: '/awardEdit',
     },
     {
+        value: 'memberEdit',
+        text: '修改人力資源',
+        // icon: 'mdi-hammer',
+        // textClass: 'text-red',
+        to: '/memberEdit',
+    },
+    {
         value: 'newsEdit',
         text: '修改最新消息',
         // icon: 'mdi-newspaper-variant',
@@ -48,6 +55,7 @@ const buttons = [
         // textClass: 'text-red',
         to: '/projectEdit',
     },
+    
 ];
 
 </script>

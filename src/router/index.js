@@ -89,7 +89,22 @@ const routes = [
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "projectEdit" */ '@/pages/awardEdit.vue'),
+        component: () => import(/* webpackChunkName: "awardEdit" */ '@/pages/awardEdit.vue'),
+        meta: { requiresAuth: true },
+      },
+    ],
+  },
+  {
+    path: '/memberEdit',
+    component: () => import('@/layouts/sandwich/BackstageLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'MemberEdit',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "memberEdit" */ '@/pages/memberEdit.vue'),
         meta: { requiresAuth: true },
       },
     ],

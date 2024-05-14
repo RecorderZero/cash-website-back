@@ -8,20 +8,20 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
-  // {
-  //   path: "/test",
-  //   name: "Test",
-  //   component: () => import('@/components/newimageUploader.vue')
-  // },
+  {
+    path: "/test",
+    name: "Test",
+    component: () => import('@/components/choseRelatedPage.vue')
+  },
   {
     path: "/",
     redirect: "/login",
   },
-  {
-    path: '/register',
-    name: 'Register',
-    component: () => import('@/pages/register.vue'),
-  },
+  // {
+  //   path: '/register',
+  //   name: 'Register',
+  //   component: () => import('@/pages/register.vue'),
+  // },
   {
     path: '/dashboard',
     component: () => import('@/layouts/sandwich/BackstageLayout.vue'),
@@ -84,16 +84,31 @@ const routes = [
     ],
   },
   {
-    path: '/awardEdit',
+    path: '/chosenAwardEdit',
     component: () => import('@/layouts/sandwich/BackstageLayout.vue'),
     children: [
       {
         path: '',
-        name: 'AwardEdit',
+        name: 'ChosenAwardEdit',
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "awardEdit" */ '@/pages/awardEdit.vue'),
+        component: () => import(/* webpackChunkName: "chosenAwardEdit" */ '@/pages/chosenAwardEdit.vue'),
+        meta: { requiresAuth: true },
+      },
+    ],
+  },
+  {
+    path: '/historyAwardEdit',
+    component: () => import('@/layouts/sandwich/BackstageLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'HistoryAwardEdit',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "historyAwardEdit" */ '@/pages/historyAwardEdit.vue'),
         meta: { requiresAuth: true },
       },
     ],

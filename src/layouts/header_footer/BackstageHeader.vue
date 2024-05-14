@@ -28,11 +28,18 @@ const buttons = [
         to: '/carouselEdit',
     },
     {
-        value: 'awardEdit',
+        value: 'chosenAwardEdit',
+        text: '修改精選獲獎',
+        // icon: 'mdi-view-carousel',
+        // textClass: 'text-brown-darken-1',
+        to: '/chosenAwardEdit',
+    },
+    {
+        value: 'historyAwardEdit',
         text: '修改歷年獲獎',
         // icon: 'mdi-hammer',
         // textClass: 'text-red',
-        to: '/awardEdit',
+        to: '/historyAwardEdit',
     },
     {
         value: 'memberEdit',

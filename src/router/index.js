@@ -14,6 +14,10 @@ const routes = [
   //   component: () => import('@/components/newimageUploader.vue')
   // },
   {
+    path: "/",
+    redirect: "/login",
+  },
+  {
     path: '/register',
     name: 'Register',
     component: () => import('@/pages/register.vue'),

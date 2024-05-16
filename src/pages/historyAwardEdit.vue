@@ -37,6 +37,9 @@
                         label="標題"
                       ></v-text-field>
                     </v-col>
+                    <p class="pl-5">選擇連結文章</p>
+                    <choseRelatedPage class="pl-3" @link="handleLink" :parentLink="originalLink" />
+                      <p class="pl-5">連結到：{{ editedItem.link }}</p>
                     <v-col cols="12">
                       <v-text-field
                         v-model="editedItem.date"
@@ -102,6 +105,7 @@
 
     export default {
       data: () => ({
+        originalLink: null,
         userName: localStorage.getItem('userName'),
         userRole: localStorage.getItem('userRole'),
         alertType: null,
@@ -113,7 +117,7 @@
           { title: '編號', align: 'start', key: 'id',},
           { title: '標題', key: 'title' },
           { title: '年度', key: 'year' },
-          { title: '日期', key: 'date' },
+          { title: '連結', key: 'link' },
           // 加上權限
           { title: '操作', key: 'actions', sortable: false },
         ],
@@ -121,11 +125,13 @@
         editedId: -1,
         editedItem: {
           title: null,
+          link: null,
           year: null,
           date: null,
         },
         defaultItem: {
           title: null,
+          link: null,
           year: null,
           date: null,
         },
@@ -154,6 +160,9 @@
         Authentication() {
           return Authentication; // 返回Authentication對象
         },
+        handleLink(link) {
+          this.editedItem.link = link
+        },
         toIsoString(date) {
           var tzo = -date.getTimezoneOffset(),
               dif = tzo >= 0 ? '+' : '-',
@@ -176,7 +185,7 @@
           this.defaultItem.date = this.editedItem.date
           // console.log(yourDate)
           // console.log(this.editedItem.date)
-          http.get('/award/')
+          http.get('/historyaward/')
             .then(response => {this.items = response.data})
             .catch(error => {console.log(error)})
         },
@@ -184,9 +193,9 @@
         async editItem(item) {
           try {
             this.editedId = item.id
-            // this.action = 'edit'
             this.editedItem = Object.assign({}, item)
             // console.log(this.editedItem)
+            this.originalLink = this.editedItem.link
             this.dialog = true
           } catch(error) {
             console.log(error)
@@ -201,7 +210,7 @@
   
         async deleteItemConfirm() {
             try {
-                await http.delete('/award/' + this.editedId + '/')
+                await http.delete('/historyaward/' + this.editedId + '/')
                 this.initialize()
                 this.alertType = "success"
                 this.alertTitle = "刪除成功"
@@ -218,6 +227,7 @@
 
         close() {
           this.dialog = false
+          this.originalLink = null
           this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedId = -1
@@ -237,9 +247,9 @@
                 let response = null
                 this.editedItem.year = this.editedItem.date.split('-')[0] - 1911
               if (this.editedId > -1) {
-                response = await http.patch('/award/' + this.editedId + '/', this.editedItem)
+                response = await http.patch('/historyaward/' + this.editedId + '/', this.editedItem)
               } else {
-                response = await http.post('/award/', this.editedItem)
+                response = await http.post('/historyaward/', this.editedItem)
               }
               response = response.data
               this.alertType = "success"

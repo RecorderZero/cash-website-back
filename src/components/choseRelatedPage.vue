@@ -16,33 +16,53 @@
                     :items="titles"
                     item-title="title"
                     ></v-select>
-                <!-- {{ titles }} -->
-                <!-- {{ this.titles.find(item => item.title === chosenTitle).id }} -->
-            </v-col>
+                </v-col>
         </v-row>
-        <v-container v-if="chosenTitle">
-        {{link + this.titles.find(item => item.title === chosenTitle).id }}
-        </v-container>
+        {{ linkFromParent }}
     </v-container>
 </template>
 
 <script>
 import http from '../http-common'
 export default {
+    props: ['parentLink'],
     data() {
         return {
+            linkFromParent: null,
             link: null,
             titles: null,
             chosenTitle: null,
+            chosenId: null,
             chosenCategory: null,
             categorys: ['最新消息', '工程實績']
         }
     },
     watch: {
+        parentLink: {
+            handler(newParentLink) {
+                if(newParentLink) {
+                    this.linkFromParent = newParentLink
+                    this.linkFromParent = this.linkFromParent.split('/')
+                    this.chosenCategory = this.linkFromParent[1]
+                    this.getTitle(this.chosenCategory)
+                }
+            },
+            immediate: true // 立即執行一次
+        },
         chosenCategory(newValue, oldValue) {
-            this.chosenTitle = null
-            this.titles = null
-            this.getTitle(newValue)
+            if(!this.linkFromParent) {
+                this.link = null
+                this.chosenTitle = null
+                this.titles = null
+                this.$emit('link', null)
+                this.getTitle(newValue)
+            }
+        },
+        chosenTitle(newValue, oldValue) {
+            if(newValue) {
+                this.chosenId = this.titles.find(item => item.title === newValue).id
+                this.$emit('link', this.link + this.chosenId)
+            }
         }
     },
     methods: {
@@ -53,6 +73,10 @@ export default {
                         .then(response => {
                             this.titles = response.data
                             this.link = '/最新消息/details/'
+                            if(this.linkFromParent) {
+                                this.chosenTitle = this.titles.find(item => item.id === parseInt(this.linkFromParent[3])).title
+                                this.linkFromParent = null
+                            }
                         })
                         .catch(error => {
                             console.log(error)
@@ -63,6 +87,10 @@ export default {
                     .then(response => {
                             this.titles = response.data
                             this.link = '/工程實績/details/'
+                            if(this.linkFromParent) {
+                                this.chosenTitle = this.titles.find(item => item.id === parseInt(this.linkFromParent[3])).title
+                                this.linkFromParent = null
+                            }
                         })
                         .catch(error => {
                             console.log(error.data)

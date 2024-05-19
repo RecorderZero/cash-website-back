@@ -7,7 +7,6 @@
             title="使用說明"
             text="如欲在前台顯示/不顯示跑馬燈，請在對應欄位打勾/取消；欲調整跑馬燈順序請透過上下鍵調整，越上面的圖片將越早出現，調整完畢後記得點選'儲存顯示'。"
             ></v-alert>
-        {{ message }}
         <!-- {{ idArray }} -->
         <v-alert
         v-if="alertType"
@@ -41,7 +40,7 @@
                   <v-container>
                     <v-row>
                       <v-col cols="12">
-                        <carouselImageUploader @image-change="handleImageChange" />
+                        <imageUploader @image-change="handleImageChange" />
                       </v-col>
                       <v-col cols="6">
                           <v-text-field
@@ -136,7 +135,6 @@ import Authentication from "../services/Authentication"
         alertTitle: null,
         alertText: null,
         idArray: [],
-        message: null,
         dialog: false,
         dialogDelete: false,
         headers: [
@@ -208,7 +206,7 @@ import Authentication from "../services/Authentication"
                 this.items = response.data
             })
             .catch(error => {
-                this.message = error
+                console.log(error)
             })
             this.fileNameParser()
         },

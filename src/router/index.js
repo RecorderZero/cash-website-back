@@ -8,11 +8,11 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
-  {
-    path: "/test",
-    name: "Test",
-    component: () => import('@/components/choseRelatedPage.vue')
-  },
+  // {
+  //   path: "/test",
+  //   name: "Test",
+  //   component: () => import('@/components/choseRelatedPage.vue')
+  // },
   {
     path: "/",
     redirect: "/login",

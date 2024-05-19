@@ -49,7 +49,7 @@ export default {
             },
             immediate: true // 立即執行一次
         },
-        chosenCategory(newValue, oldValue) {
+        chosenCategory(newValue) {
             if(!this.linkFromParent) {
                 this.link = null
                 this.chosenTitle = null
@@ -58,7 +58,7 @@ export default {
                 this.getTitle(newValue)
             }
         },
-        chosenTitle(newValue, oldValue) {
+        chosenTitle(newValue) {
             if(newValue) {
                 this.chosenId = this.titles.find(item => item.title === newValue).id
                 this.$emit('link', this.link + this.chosenId)

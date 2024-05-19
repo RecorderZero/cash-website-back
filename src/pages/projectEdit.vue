@@ -51,7 +51,7 @@
                         ></v-textarea>
                     </v-col>
                     <v-col cols="12">
-                      <imageUploader source="project" :cloudItems="cloudItems" @id-array-updated="handleIdArrayUpdate" />
+                      <imagesUploader source="project" :cloudItems="cloudItems" @id-array-updated="handleIdArrayUpdate" />
                     </v-col>
                     <v-col cols="6">
                       <v-select

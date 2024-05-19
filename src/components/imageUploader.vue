@@ -25,7 +25,7 @@ export default {
         };
     },
     watch: {
-        image(newImage, oldImage) {
+        image(newImage) {
             // console.log('uploader')
             // console.log(newImage)
             this.$emit('image-change', newImage)

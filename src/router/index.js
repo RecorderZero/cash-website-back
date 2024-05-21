@@ -17,11 +17,6 @@ const routes = [
     path: "/",
     redirect: "/login",
   },
-  // {
-  //   path: '/register',
-  //   name: 'Register',
-  //   component: () => import('@/pages/register.vue'),
-  // },
   {
     path: '/dashboard',
     component: () => import('@/layouts/sandwich/BackstageLayout.vue'),
@@ -128,60 +123,11 @@ const routes = [
       },
     ],
   },
-  // {
-  //   path: '/upload',
-  //   component: () => import('@/layouts/sandwich/BackstageLayout.vue'),
-  //   children: [
-  //     {
-  //       path: '',
-  //       name: 'Upload',
-  //       // route level code-splitting
-  //       // this generates a separate chunk (about.[hash].js) for this route
-  //       // which is lazy-loaded when the route is visited.
-  //       component: () => import(/* webpackChunkName: "upload" */ '@/pages/upload.vue'),
-  //     },
-  //   ],
-  // },
   {
     path: '/login',
     name: 'Login',
     component: () => import('@/pages/login.vue'),
-    // children: [
-    //   {
-    //     path: '',
-    //     name: 'Login',
-    //     // route level code-splitting
-    //     // this generates a separate chunk (about.[hash].js) for this route
-    //     // which is lazy-loaded when the route is visited.
-    //     component: () => import(/* webpackChunkName: "login" */ '@/pages/login.vue'),
-    //   },
-    // ],
   },
-  // {
-  //   path: '/logout',
-  //   name: 'Logout',
-  //   component: () => import('@/components/logout.vue')
-  // }
-  // {
-  //   path: '/forgotPassword',
-  //   name: 'ForgotPassword',
-  //   component: () => import(/* webpackChunkName: "forgotPassword" */ '@/pages/forgotPassword.vue'),
-  // },
-  // {
-  //   path: '/otp',
-  //   name: 'OTP',
-  //   component: () => import(/* webpackChunkName: "otp" */ '@/pages/otp.vue'),
-  // },
-  // {
-  //   path: '/resetPassword',
-  //   name: 'ResetPassword',
-  //   component: () => import(/* webpackChunkName: "resetPassword" */ '@/pages/resetPassword.vue'),
-  // },
-  // {
-  //   path: '/uploadFiles',
-  //   name: 'UploadFiles',
-  //   component: () => import(/* webpackChunkName: "uploadFiles" */ '@/components/UploadFiles.vue'),
-  // },
 ]
 
 const router = createRouter({

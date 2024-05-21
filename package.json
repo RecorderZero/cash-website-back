@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --outDir D:/code/nginx-1.26.0/html/backend",
     "preview": "vite preview",
     "lint": "eslint . --fix --ignore-path .gitignore"
   },

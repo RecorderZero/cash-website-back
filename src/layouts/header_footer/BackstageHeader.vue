@@ -77,10 +77,10 @@ const buttons = [
             Welcome!
         </v-app-bar-title> -->
         <v-app-bar-nav-icon>
-            <img src="/src/assets/cash.jpg" width="100%" height="100%">
+            <img src="/cash.ico" width="100%" height="100%">
         </v-app-bar-nav-icon>
         <v-app-bar-title>
-            後臺
+            開巨後臺
         </v-app-bar-title>
         <!-- {{ userName }} -->
         <!-- 電腦導航欄 -->

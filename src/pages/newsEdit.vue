@@ -341,6 +341,7 @@
               this.alertType = "error"
               this.alertTitle = "儲存失敗"
               this.alertText = error
+              console.log(error)
             }
           this.close()
         },

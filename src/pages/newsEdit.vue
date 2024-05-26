@@ -322,7 +322,7 @@
           // if (this.editedId > -1) {
             try {
               const imageItem = await http.get('/newimage/' + this.editedItem.imageUrl + '/')
-              // console.log(imageItem)
+              console.log(imageItem)
               let response = null
               this.editedItem.imageUrl = imageItem.data.image
               if (this.editedId > -1) {

@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
     <v-img class="mx-auto my-6" max-width="100"
-      src="/src/assets/cash.jpg"></v-img>
+      src="/cash.ico"></v-img>
     <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg">
       <v-card-title align="center">後臺登入</v-card-title>
       <v-form v-model="form" @submit.prevent="login">
@@ -63,7 +63,7 @@ export default {
         router.push('/register')
     },
     async login() {
-        http.get('/verify/', { params: this.user })
+        http.get('verify/', { params: this.user })
             .then(responce => {
                 // console.log(responce.data)
                 const user = responce.data

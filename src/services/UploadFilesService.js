@@ -49,13 +49,13 @@ class UploadFilesService {
     }
     // // carousel order處理，讓新加入的排前面
     // async fixCarousel(shift) {
-    //     return http.get('get_valid_carousel?source=back')
+    //     return http.get('carouselimage/?displayornot=true')
     //         .then(response => {
     //             const carouselNeedFixOrder = response.data
     //             // console.log(carouselNeedFixOrder)
     //             let requests = []
     //             for (let x = 0; x < carouselNeedFixOrder.length; x++) {
-    //                 let request = http.patch('/carouselimage/' + carouselNeedFixOrder[x].id + '/', {
+    //                 let request = http.patch('carouselimage/' + carouselNeedFixOrder[x].id + '/', {
     //                     'order': carouselNeedFixOrder[x].order + shift
     //                 }, {
     //                     'headers': {

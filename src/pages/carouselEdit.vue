@@ -7,15 +7,12 @@
             title="使用說明"
             text="如欲在前台顯示/不顯示跑馬燈，請在對應欄位打勾/取消；欲調整跑馬燈順序請透過上下鍵調整，越上面的圖片將越早出現，調整完畢後記得點選'儲存顯示'。"
             ></v-alert>
-        <!-- {{ idArray }} -->
         <v-alert
         v-if="alertType"
         :color="alertType"
         :icon="'$' + alertType"
         :title="alertTitle"
         >{{ alertText }}</v-alert>
-        <!-- items:{{ items }}<br>
-        idArray:{{ idArray }} -->
         <v-data-table
             :headers="headers"
             :items="items"
@@ -53,16 +50,9 @@
                           v-model="editedItem.date"
                           label="完工時間(yyyy-mm-dd)"
                           ></v-text-field>
-                          <!-- <v-date-picker
-                              color="primary"
-                              v-model="editedItem.date"
-                          ></v-date-picker> -->
                       </v-col>
                     </v-row>
-                    <!-- {{ editedItem }} -->
                   </v-container>
-                  <!--{{ editedItem }}
-                  {{ editedItem.date }}-->
                 </v-card-text>
     
                 <v-card-actions>
@@ -102,7 +92,6 @@
           <v-img :src="item.image"></v-img>
         </template>
         <template v-slot:item.displayornot="{ item }">
-            <!-- {{ item }} -->
             <v-checkbox v-model="item.displayornot" @change="appending(item)" :disabled="!Authentication().modify(userRole)"></v-checkbox>
         </template>
         <template v-slot:item.actions="{ item, index }">
@@ -201,7 +190,7 @@ import Authentication from "../services/Authentication"
             let yourDate = new Date()
             this.editedItem.date = this.toIsoString(yourDate).split('T')[0]
             this.defaultItem.date = this.editedItem.date
-            await http.get('/carouselimage/')
+            await http.get('carouselimage/')
             .then(response => {
                 this.items = response.data
             })
@@ -241,7 +230,12 @@ import Authentication from "../services/Authentication"
         async save() {
             try {
                 await UpdateData.updateDisplay(this.idArray)
-                const lastTrueInItems = this.items.findIndex(find => find.displayornot === false) - 1
+                let lastTrueInItems = this.items.findIndex(find => find.displayornot === false) - 1
+                console.log("前" + lastTrueInItems)
+                if(lastTrueInItems == -2) {
+                  lastTrueInItems = this.items.length - 1
+                }
+                console.log("後" + lastTrueInItems)
                 const carouselNeedToMove999 = this.idArray.filter(find => find.displayornot === false)
                 await UpdateData.updateOrder(this.items.slice(0, lastTrueInItems + 1), carouselNeedToMove999)
                 this.alertType = 'success'
@@ -275,7 +269,7 @@ import Authentication from "../services/Authentication"
   
         async deleteItemConfirm() {
             try {
-                await http.delete('/carouselimage/' + this.editedId + '/')
+                await http.delete('carouselimage/' + this.editedId + '/')
                 // 如果刪除的是顯示的carousel，則將後面displayornot == true的carousel其order都更新
                 const indexOfDelete = this.items.findIndex(find => find.id === this.editedId)
                 // console.log(indexOfDelete)
@@ -284,7 +278,7 @@ import Authentication from "../services/Authentication"
                   for(let x = indexOfDelete + 1; x < this.items.length && this.items[x].displayornot; x++) {
                     let carousel_instance = this.items[x]
                     // console.log(carousel_instance)
-                    let request = http.patch('/carouselimage/' + carousel_instance.id + '/', {
+                    let request = http.patch('carouselimage/' + carousel_instance.id + '/', {
                       'order': carousel_instance.order - 1
                     }, {
                       headers: {
@@ -325,7 +319,7 @@ import Authentication from "../services/Authentication"
             // console.log(files[x])
             // console.log(x + 1)
             // console.log(formData)
-            const response = await http.post('/carouselimage/', formData, {
+            const response = await http.post('carouselimage/', formData, {
               headers: {
                   "Content-Type": "multipart/form-data"
               }
@@ -347,13 +341,13 @@ import Authentication from "../services/Authentication"
         },
         // carousel order處理，讓新加入的排前面
         async fixCarousel(shift) {
-            return http.get('get_valid_carousel?source=back')
+            return http.get('carouselimage/?displayornot=true') // carousel displayornot=true
                 .then(response => {
                     const carouselNeedFixOrder = response.data
                     // console.log(carouselNeedFixOrder)
                     let requests = []
                     for (let x = 0; x < carouselNeedFixOrder.length; x++) {
-                        let request = http.patch('/carouselimage/' + carouselNeedFixOrder[x].id + '/', {
+                        let request = http.patch('carouselimage/' + carouselNeedFixOrder[x].id + '/', {
                             'order': carouselNeedFixOrder[x].order + shift
                         }, {
                             'headers': {

@@ -392,7 +392,7 @@
         async save() {
           try {
               const imageItem = await http.get('/projectimage/' + this.editedItem.imageUrl + '/')
-              // console.log(imageItem)
+              console.log(imageItem)
               let response = null
               this.editedItem.imageUrl = imageItem.data.image
               // 員工

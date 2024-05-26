@@ -5,7 +5,7 @@ class UpdateDataService {
         let requests = [];
         
         for (let x = 0; x < images.length; x++) {
-            let request = http.patch('/newimage/' + images[x] + '/', {
+            let request = http.patch('newimage/' + images[x] + '/', {
                 'related_new': new_id
             }, {
                 headers: {
@@ -20,7 +20,7 @@ class UpdateDataService {
         let requests = [];
 
         for(let x = 0; x < idArray.length; x++) {
-            let request = http.patch('/carouselimage/' + idArray[x].id + '/', {
+            let request = http.patch('carouselimage/' + idArray[x].id + '/', {
                 'displayornot': idArray[x].displayornot
             }, {
                 headers: {
@@ -35,7 +35,7 @@ class UpdateDataService {
         let requests = [];
         
         for (let x = 0; x < images.length; x++) {
-            let request = http.patch('/projectimage/' + images[x] + '/', {
+            let request = http.patch('projectimage/' + images[x] + '/', {
                 'related_project': project_id
             }, {
                 headers: {
@@ -51,7 +51,7 @@ class UpdateDataService {
         // 更新有顯示的
         for (let x = 0; x < images.length; x++) {
             let order = x + 1
-            let request = http.patch('/carouselimage/' + images[x].id + '/', {
+            let request = http.patch('carouselimage/' + images[x].id + '/', {
                 'order': order
             }, {
                 headers: {
@@ -62,7 +62,7 @@ class UpdateDataService {
         }
         // 更新未顯示的
         for (let x = 0; x < carouselNeedToMove999.length; x++) {
-            let request = http.patch('/carouselimage/' + carouselNeedToMove999[x].id + '/', {
+            let request = http.patch('carouselimage/' + carouselNeedToMove999[x].id + '/', {
                 'order': 999
             }, {
                 headers: {
@@ -71,6 +71,7 @@ class UpdateDataService {
             })
             requests.push(request)
         }
+        console.log(requests)
         return Promise.all(requests)
     }
     updateResource(resource) {
